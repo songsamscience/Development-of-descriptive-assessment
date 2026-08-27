@@ -1,0 +1,2090 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>송쌤과학 서논술형 평가 계획 및 문항 개발 제작 사이트</title>
+<meta name="description" content="2022 개정 교육과정 과학과 성취기준에 기반하여 서·논술형 평가 계획 수립, 문항 개발, 채점기준표 제작, 평가 에이전트 설계를 지원하는 도구">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%232f6df6'/%3E%3Cstop offset='.55' stop-color='%237c4dff'/%3E%3Cstop offset='1' stop-color='%2300b8a9'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='24' fill='url(%23g)'/%3E%3Cpath d='M38 22h30a6 6 0 0 1 6 6v44a6 6 0 0 1-6 6H38' fill='none' stroke='%23fff' stroke-width='6' stroke-linecap='round'/%3E%3Cpath d='M38 22a10 10 0 0 0 0 20h10' fill='none' stroke='%23fff' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M38 78a10 10 0 0 1 0-20h10' fill='none' stroke='%23fff' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='50' cy='50' r='6' fill='%23fff'/%3E%3C/svg%3E">
+<style id="appcss">
+/* ==========================================================================
+   송쌤과학 서논술형 평가 계획 및 문항 개발 제작 사이트
+   style.css
+   ========================================================================== */
+
+/* ---------- 1. 디자인 토큰 ---------- */
+:root {
+  color-scheme: light;
+
+  --bg:            #f4f6fb;
+  --bg-grad-1:     #e8eefc;
+  --bg-grad-2:     #f6f0fb;
+  --surface:       #ffffff;
+  --surface-2:     #f7f9fd;
+  --surface-3:     #eef2fa;
+  --surface-glass: rgba(255,255,255,.72);
+
+  --text:          #14213a;
+  --text-2:        #435070;
+  --text-3:        #7a86a3;
+
+  --line:          #dfe5f2;
+  --line-2:        #c9d3e8;
+
+  --brand:         #2f6df6;
+  --brand-2:       #7c4dff;
+  --brand-3:       #00b8a9;
+  --brand-soft:    rgba(47,109,246,.10);
+  --brand-soft-2:  rgba(124,77,255,.10);
+
+  --ok:            #10a37f;
+  --ok-soft:       rgba(16,163,127,.12);
+  --warn:          #e6892a;
+  --warn-soft:     rgba(230,137,42,.13);
+  --danger:        #e0455c;
+  --danger-soft:   rgba(224,69,92,.12);
+
+  --shadow-1: 0 1px 2px rgba(20,33,58,.05), 0 2px 8px rgba(20,33,58,.05);
+  --shadow-2: 0 4px 12px rgba(20,33,58,.07), 0 12px 32px rgba(20,33,58,.08);
+  --shadow-3: 0 8px 24px rgba(20,33,58,.10), 0 24px 60px rgba(20,33,58,.12);
+
+  --r-sm: 8px;  --r: 14px;  --r-lg: 20px;  --r-xl: 28px;
+
+  --font: "Pretendard", "Pretendard Variable", -apple-system, BlinkMacSystemFont,
+          "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "맑은 고딕",
+          system-ui, sans-serif;
+  --mono: "SF Mono", "JetBrains Mono", "D2Coding", ui-monospace, Menlo, Consolas, monospace;
+
+  --nav-h: 64px;
+  --maxw: 1200px;
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg:            #0b1020;
+  --bg-grad-1:     #111a35;
+  --bg-grad-2:     #1a1330;
+  --surface:       #141b2e;
+  --surface-2:     #182031;
+  --surface-3:     #1e2740;
+  --surface-glass: rgba(20,27,46,.72);
+
+  --text:          #e8edf9;
+  --text-2:        #aeb9d4;
+  --text-3:        #7c88a6;
+
+  --line:          #26314b;
+  --line-2:        #33405e;
+
+  --brand:         #6f9bff;
+  --brand-2:       #a888ff;
+  --brand-3:       #2ad4c3;
+  --brand-soft:    rgba(111,155,255,.14);
+  --brand-soft-2:  rgba(168,136,255,.14);
+
+  --ok:            #33d9a6;
+  --ok-soft:       rgba(51,217,166,.14);
+  --warn:          #ffb057;
+  --warn-soft:     rgba(255,176,87,.15);
+  --danger:        #ff7085;
+  --danger-soft:   rgba(255,112,133,.15);
+
+  --shadow-1: 0 1px 2px rgba(0,0,0,.3), 0 2px 8px rgba(0,0,0,.25);
+  --shadow-2: 0 4px 12px rgba(0,0,0,.35), 0 12px 32px rgba(0,0,0,.3);
+  --shadow-3: 0 8px 24px rgba(0,0,0,.4), 0 24px 60px rgba(0,0,0,.45);
+}
+
+/* ---------- 2. 리셋 & 기본 ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  overflow-x: hidden;
+  transition: background-color .4s ease, color .4s ease;
+}
+
+/* 배경 데코 */
+#bgfx {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(900px 500px at 12% -8%, var(--bg-grad-1) 0%, transparent 62%),
+    radial-gradient(800px 460px at 96% 4%, var(--bg-grad-2) 0%, transparent 60%);
+}
+#bgcanvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: .55; }
+
+h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -.02em; line-height: 1.35; }
+p { margin: 0 0 .7em; }
+a { color: var(--brand); text-decoration: none; }
+a:hover { text-decoration: underline; }
+ul, ol { margin: 0 0 .7em; padding-left: 1.25em; }
+li { margin: .18em 0; }
+small { font-size: .82em; }
+code, kbd { font-family: var(--mono); font-size: .88em; }
+
+::selection { background: var(--brand-soft); }
+
+/* 스크롤바 */
+::-webkit-scrollbar { width: 11px; height: 11px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--line-2); border-radius: 99px;
+  border: 3px solid var(--bg); background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--text-3); background-clip: padding-box; border: 3px solid var(--bg); }
+
+/* ---------- 3. 헤더 ---------- */
+.topbar {
+  position: sticky; top: 0; z-index: 60;
+  background: var(--surface-glass);
+  backdrop-filter: saturate(1.6) blur(14px);
+  -webkit-backdrop-filter: saturate(1.6) blur(14px);
+  border-bottom: 1px solid var(--line);
+}
+.topbar-inner {
+  max-width: var(--maxw); margin: 0 auto; padding: 0 20px;
+  height: var(--nav-h); display: flex; align-items: center; gap: 14px;
+}
+.brand { display: flex; align-items: center; gap: 11px; min-width: 0; }
+.brand-logo {
+  width: 38px; height: 38px; border-radius: 11px; flex: none;
+  display: grid; place-items: center;
+  background: linear-gradient(135deg, var(--brand), var(--brand-2) 55%, var(--brand-3));
+  box-shadow: 0 4px 14px rgba(47,109,246,.32);
+  position: relative; overflow: hidden;
+}
+.brand-logo svg { width: 23px; height: 23px; }
+.brand-logo::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,.45) 48%, transparent 62%);
+  transform: translateX(-120%);
+  animation: sheen 5.5s ease-in-out infinite;
+}
+@keyframes sheen { 0%,70% { transform: translateX(-120%);} 88%,100% { transform: translateX(130%);} }
+
+.brand-text { min-width: 0; }
+.brand-title {
+  font-size: 15.5px; font-weight: 800; letter-spacing: -.03em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.brand-sub { font-size: 11px; color: var(--text-3); letter-spacing: .01em; margin-top: -2px; }
+
+.topbar-tools { margin-left: auto; display: flex; align-items: center; gap: 7px; }
+
+/* ---------- 4. 버튼 ---------- */
+.btn {
+  --btn-bg: var(--surface);
+  --btn-fg: var(--text-2);
+  --btn-bd: var(--line);
+  appearance: none; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 8px 13px; border-radius: 10px;
+  background: var(--btn-bg); color: var(--btn-fg);
+  border: 1px solid var(--btn-bd);
+  font-family: inherit; font-size: 13px; font-weight: 600; letter-spacing: -.01em;
+  transition: transform .14s cubic-bezier(.2,.8,.3,1), box-shadow .18s, background-color .18s, color .18s, border-color .18s;
+  white-space: nowrap;
+}
+.btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-1); color: var(--text); border-color: var(--line-2); }
+.btn:active { transform: translateY(0) scale(.985); }
+.btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.btn svg { width: 15px; height: 15px; flex: none; }
+
+.btn-primary {
+  --btn-fg: #fff; --btn-bd: transparent;
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  box-shadow: 0 3px 12px rgba(47,109,246,.3);
+}
+.btn-primary:hover { color: #fff; box-shadow: 0 6px 20px rgba(47,109,246,.4); }
+.btn-ghost { --btn-bg: transparent; --btn-bd: transparent; }
+.btn-ghost:hover { --btn-bg: var(--surface-3); }
+.btn-soft { --btn-bg: var(--brand-soft); --btn-fg: var(--brand); --btn-bd: transparent; }
+.btn-soft:hover { color: var(--brand); }
+.btn-danger { --btn-bg: var(--danger-soft); --btn-fg: var(--danger); --btn-bd: transparent; }
+.btn-danger:hover { color: var(--danger); }
+.btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 8px; }
+.btn-icon { padding: 8px; width: 36px; height: 36px; }
+.btn-icon svg { width: 17px; height: 17px; }
+
+/* 테마 토글 */
+#themeToggle .sun, #themeToggle .moon { transition: transform .45s cubic-bezier(.2,.9,.3,1), opacity .3s; }
+html:not([data-theme="dark"]) #themeToggle .moon { opacity: 0; transform: rotate(-70deg) scale(.4); position: absolute; }
+html[data-theme="dark"] #themeToggle .sun { opacity: 0; transform: rotate(70deg) scale(.4); position: absolute; }
+#themeToggle { position: relative; overflow: hidden; }
+
+/* ---------- 5. 탭 내비게이션 ---------- */
+.tabbar {
+  position: sticky; top: var(--nav-h); z-index: 55;
+  background: var(--surface-glass);
+  backdrop-filter: saturate(1.6) blur(14px);
+  -webkit-backdrop-filter: saturate(1.6) blur(14px);
+  border-bottom: 1px solid var(--line);
+}
+.tabbar-inner {
+  max-width: var(--maxw); margin: 0 auto; padding: 0 20px;
+  display: flex; gap: 2px; position: relative; overflow-x: auto; scrollbar-width: none;
+}
+.tabbar-inner::-webkit-scrollbar { display: none; }
+.tab {
+  appearance: none; background: none; border: 0; cursor: pointer;
+  font-family: inherit; font-size: 13.5px; font-weight: 700; letter-spacing: -.02em;
+  color: var(--text-3); padding: 13px 15px 12px; border-radius: 10px 10px 0 0;
+  display: flex; align-items: center; gap: 8px; white-space: nowrap;
+  transition: color .2s, background-color .2s; position: relative;
+}
+.tab:hover { color: var(--text-2); background: var(--surface-3); }
+.tab.active { color: var(--brand); }
+.tab-num {
+  width: 21px; height: 21px; border-radius: 7px; flex: none;
+  display: grid; place-items: center; font-size: 11px; font-weight: 800;
+  background: var(--surface-3); color: var(--text-3);
+  transition: background-color .25s, color .25s, transform .25s;
+}
+.tab.active .tab-num {
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  color: #fff; transform: scale(1.06);
+}
+#tabInk {
+  position: absolute; bottom: 0; height: 3px; border-radius: 3px 3px 0 0;
+  background: linear-gradient(90deg, var(--brand), var(--brand-2), var(--brand-3));
+  transition: left .38s cubic-bezier(.2,.9,.3,1), width .38s cubic-bezier(.2,.9,.3,1);
+  pointer-events: none;
+}
+
+/* ---------- 6. 레이아웃 ---------- */
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 26px 20px 90px; position: relative; z-index: 1; }
+.panel { display: none; animation: panelIn .42s cubic-bezier(.2,.8,.3,1); }
+.panel.active { display: block; }
+@keyframes panelIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+.grid { display: grid; gap: 16px; }
+.g2 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+.g3 { grid-template-columns: repeat(3, minmax(0,1fr)); }
+.g4 { grid-template-columns: repeat(4, minmax(0,1fr)); }
+@media (max-width: 900px) { .g3, .g4 { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+@media (max-width: 640px) { .g2, .g3, .g4 { grid-template-columns: 1fr; } }
+
+/* ---------- 7. 히어로 ---------- */
+.hero {
+  position: relative; overflow: hidden;
+  border-radius: var(--r-xl); padding: 34px 32px;
+  background: linear-gradient(135deg, #2f6df6 0%, #6b4bf0 48%, #00b8a9 120%);
+  color: #fff; box-shadow: var(--shadow-3); margin-bottom: 22px;
+}
+.hero::before {
+  content: ""; position: absolute; inset: -40%;
+  background:
+    radial-gradient(closest-side, rgba(255,255,255,.28), transparent 70%) 18% 22%/44% 60% no-repeat,
+    radial-gradient(closest-side, rgba(255,255,255,.18), transparent 70%) 82% 76%/50% 66% no-repeat;
+  animation: heroFloat 16s ease-in-out infinite alternate;
+}
+@keyframes heroFloat { from { transform: translate3d(0,0,0) rotate(0deg);} to { transform: translate3d(3%,-4%,0) rotate(7deg);} }
+.hero::after {
+  content: ""; position: absolute; inset: 0; opacity: .16;
+  background-image:
+    linear-gradient(rgba(255,255,255,.4) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.4) 1px, transparent 1px);
+  background-size: 34px 34px;
+  mask-image: radial-gradient(120% 100% at 80% 0%, #000 20%, transparent 72%);
+  -webkit-mask-image: radial-gradient(120% 100% at 80% 0%, #000 20%, transparent 72%);
+}
+.hero > * { position: relative; z-index: 1; }
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.3);
+  padding: 5px 12px; border-radius: 99px; font-size: 12px; font-weight: 700;
+  backdrop-filter: blur(6px); margin-bottom: 13px;
+}
+.hero h1 { font-size: clamp(21px, 3.1vw, 31px); font-weight: 800; letter-spacing: -.035em; }
+.hero p { margin: 9px 0 0; opacity: .93; font-size: 14.5px; max-width: 66ch; }
+.hero-stats { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 18px; }
+.hero-stat {
+  background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.24);
+  border-radius: 12px; padding: 9px 14px; backdrop-filter: blur(6px);
+}
+.hero-stat b { display: block; font-size: 18px; font-weight: 800; letter-spacing: -.03em; }
+.hero-stat span { font-size: 11.5px; opacity: .88; }
+
+/* ---------- 8. 카드 ---------- */
+.card {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--r-lg); padding: 22px;
+  box-shadow: var(--shadow-1); margin-bottom: 16px;
+  transition: box-shadow .25s, border-color .25s, transform .25s;
+}
+.card:hover { box-shadow: var(--shadow-2); border-color: var(--line-2); }
+.card.flat:hover { box-shadow: var(--shadow-1); }
+
+.card-head { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px; }
+.card-ico {
+  width: 36px; height: 36px; border-radius: 11px; flex: none; display: grid; place-items: center;
+  background: linear-gradient(135deg, var(--brand-soft), var(--brand-soft-2)); color: var(--brand);
+}
+.card-ico svg { width: 19px; height: 19px; }
+.card-head h2 { font-size: 17px; letter-spacing: -.03em; }
+.card-head h3 { font-size: 15.5px; letter-spacing: -.025em; }
+.card-head .desc { font-size: 12.8px; color: var(--text-3); margin: 2px 0 0; line-height: 1.5; }
+.card-head-tools { margin-left: auto; display: flex; gap: 6px; flex: none; }
+
+.section-title {
+  font-size: 13px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase;
+  color: var(--text-3); margin: 26px 0 12px; display: flex; align-items: center; gap: 9px;
+}
+.section-title::after { content: ""; height: 1px; flex: 1; background: linear-gradient(90deg, var(--line), transparent); }
+
+/* ---------- 9. 폼 ---------- */
+.field { margin-bottom: 14px; }
+.field > label, .lbl {
+  display: block; font-size: 12.5px; font-weight: 700; color: var(--text-2);
+  margin-bottom: 6px; letter-spacing: -.01em;
+}
+.lbl .req { color: var(--danger); margin-left: 3px; }
+.hint { font-size: 11.8px; color: var(--text-3); margin-top: 5px; line-height: 1.5; }
+
+input[type="text"], input[type="number"], input[type="date"], select, textarea {
+  width: 100%; font-family: inherit; font-size: 14px; color: var(--text);
+  background: var(--surface-2); border: 1px solid var(--line);
+  border-radius: var(--r-sm); padding: 9px 11px;
+  transition: border-color .18s, box-shadow .18s, background-color .18s;
+}
+textarea { resize: vertical; min-height: 84px; line-height: 1.7; }
+input:focus, select:focus, textarea:focus {
+  outline: none; border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-soft); background: var(--surface);
+}
+input::placeholder, textarea::placeholder { color: var(--text-3); opacity: .75; }
+select {
+  appearance: none; cursor: pointer; padding-right: 32px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237a86a3' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center; background-size: 15px;
+}
+html[data-theme="dark"] select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237c88a6' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+}
+
+/* 칩 선택 */
+.chips { display: flex; flex-wrap: wrap; gap: 7px; }
+.chip {
+  appearance: none; cursor: pointer; font-family: inherit;
+  font-size: 12.5px; font-weight: 600; letter-spacing: -.01em;
+  padding: 6px 12px; border-radius: 99px;
+  background: var(--surface-2); border: 1px solid var(--line); color: var(--text-2);
+  transition: all .18s cubic-bezier(.2,.8,.3,1);
+}
+.chip:hover { border-color: var(--brand); color: var(--brand); transform: translateY(-1px); }
+.chip.on {
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  border-color: transparent; color: #fff; box-shadow: 0 3px 10px rgba(47,109,246,.28);
+}
+
+/* 라디오 / 체크 pill */
+.pillset { display: flex; flex-wrap: wrap; gap: 7px; }
+.pill { position: relative; }
+.pill input { position: absolute; opacity: 0; pointer-events: none; }
+.pill span {
+  display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+  font-size: 12.8px; font-weight: 600; padding: 7px 13px; border-radius: 10px;
+  background: var(--surface-2); border: 1px solid var(--line); color: var(--text-2);
+  transition: all .18s;
+}
+.pill:hover span { border-color: var(--line-2); color: var(--text); }
+.pill input:checked + span {
+  background: var(--brand-soft); border-color: var(--brand); color: var(--brand); font-weight: 700;
+}
+.pill input:focus-visible + span { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+/* ---------- 10. 표 ---------- */
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); }
+table { width: 100%; border-collapse: collapse; font-size: 13.4px; }
+th, td { padding: 10px 12px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+thead th {
+  background: var(--surface-3); font-size: 12px; font-weight: 800; color: var(--text-2);
+  letter-spacing: -.01em; white-space: nowrap; position: sticky; top: 0; z-index: 1;
+}
+tbody tr:last-child td { border-bottom: 0; }
+tbody tr { transition: background-color .15s; }
+tbody tr:hover { background: var(--surface-2); }
+td.num, th.num { text-align: center; white-space: nowrap; }
+table.compact th, table.compact td { padding: 7px 10px; font-size: 12.8px; }
+table input, table textarea, table select { font-size: 13px; padding: 6px 8px; }
+
+/* ---------- 11. 체크리스트 ---------- */
+.checklist { display: flex; flex-direction: column; gap: 2px; }
+.cl-item {
+  display: flex; align-items: flex-start; gap: 11px; padding: 10px 12px;
+  border-radius: 11px; cursor: pointer; transition: background-color .16s;
+  border: 1px solid transparent;
+}
+.cl-item:hover { background: var(--surface-2); }
+.cl-item input { position: absolute; opacity: 0; pointer-events: none; }
+.cl-box {
+  width: 19px; height: 19px; flex: none; margin-top: 2px; border-radius: 6px;
+  border: 2px solid var(--line-2); background: var(--surface);
+  display: grid; place-items: center; transition: all .2s cubic-bezier(.2,.8,.3,1);
+}
+.cl-box svg { width: 12px; height: 12px; stroke: #fff; stroke-width: 3.4;
+  stroke-dasharray: 20; stroke-dashoffset: 20; transition: stroke-dashoffset .28s ease .05s; }
+.cl-item input:checked ~ .cl-box {
+  background: linear-gradient(135deg, var(--ok), #16b98d); border-color: transparent;
+  transform: scale(1.06);
+}
+.cl-item input:checked ~ .cl-box svg { stroke-dashoffset: 0; }
+.cl-item input:checked ~ .cl-txt { color: var(--text-3); }
+.cl-item input:checked ~ .cl-txt .cl-main { text-decoration: line-through; text-decoration-color: var(--line-2); }
+.cl-item input:focus-visible ~ .cl-box { outline: 2px solid var(--brand); outline-offset: 2px; }
+.cl-txt { font-size: 13.4px; line-height: 1.6; transition: color .2s; }
+.cl-main { font-weight: 600; color: var(--text); transition: color .2s; }
+.cl-item input:checked ~ .cl-txt .cl-main { color: var(--text-3); }
+.cl-sub { display: block; font-size: 11.8px; color: var(--text-3); margin-top: 2px; }
+
+/* 진행률 */
+.progress-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.progress-bar {
+  flex: 1; height: 8px; border-radius: 99px; background: var(--surface-3); overflow: hidden;
+}
+.progress-fill {
+  height: 100%; border-radius: 99px; width: 0%;
+  background: linear-gradient(90deg, var(--brand), var(--brand-2), var(--brand-3));
+  transition: width .5s cubic-bezier(.2,.9,.3,1);
+}
+.progress-num { font-size: 12.5px; font-weight: 800; color: var(--text-2); white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+/* 링 게이지 */
+.ring { --p: 0; width: 62px; height: 62px; flex: none; position: relative; }
+.ring svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+.ring circle { fill: none; stroke-width: 7; stroke-linecap: round; }
+.ring .bgc { stroke: var(--surface-3); }
+.ring .fgc { stroke: var(--brand); transition: stroke-dashoffset .7s cubic-bezier(.2,.9,.3,1), stroke .3s; }
+.ring b {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  font-size: 14px; font-weight: 800; letter-spacing: -.04em; font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 12. 아코디언 ---------- */
+.acc { border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; background: var(--surface); margin-bottom: 10px; }
+.acc + .acc { margin-top: -2px; }
+.acc-head {
+  width: 100%; appearance: none; background: none; border: 0; cursor: pointer; text-align: left;
+  font-family: inherit; padding: 14px 16px; display: flex; align-items: center; gap: 12px;
+  transition: background-color .18s;
+}
+.acc-head:hover { background: var(--surface-2); }
+.acc-step {
+  width: 28px; height: 28px; border-radius: 9px; flex: none; display: grid; place-items: center;
+  font-size: 12px; font-weight: 800; color: #fff;
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  box-shadow: 0 2px 8px rgba(47,109,246,.28);
+}
+.acc-title { font-size: 14.5px; font-weight: 700; color: var(--text); letter-spacing: -.02em; }
+.acc-sub { font-size: 11.8px; color: var(--text-3); }
+.acc-meta { margin-left: auto; display: flex; align-items: center; gap: 10px; flex: none; }
+.acc-count {
+  font-size: 11.5px; font-weight: 800; color: var(--text-3);
+  background: var(--surface-3); padding: 3px 9px; border-radius: 99px; font-variant-numeric: tabular-nums;
+}
+.acc-count.done { background: var(--ok-soft); color: var(--ok); }
+.acc-caret { width: 17px; height: 17px; color: var(--text-3); transition: transform .3s cubic-bezier(.2,.9,.3,1); }
+.acc.open .acc-caret { transform: rotate(180deg); }
+.acc-body { display: none; padding: 2px 14px 16px; border-top: 1px solid var(--line); }
+.acc.open .acc-body { display: block; animation: accIn .34s cubic-bezier(.2,.8,.3,1); }
+@keyframes accIn { from { opacity: 0; transform: translateY(-6px);} to { opacity: 1; transform: none; } }
+
+/* ---------- 13. 성취기준 선택기 ---------- */
+.std-toolbar { display: grid; grid-template-columns: 1fr 1fr 1fr 1.4fr; gap: 8px; margin-bottom: 12px; }
+@media (max-width: 800px) { .std-toolbar { grid-template-columns: 1fr 1fr; } }
+.std-list {
+  max-height: 340px; overflow-y: auto; border: 1px solid var(--line);
+  border-radius: var(--r); background: var(--surface-2); padding: 6px;
+}
+.std-row {
+  display: flex; align-items: flex-start; gap: 10px; padding: 9px 10px;
+  border-radius: 10px; cursor: pointer; transition: background-color .15s;
+}
+.std-row:hover { background: var(--surface); }
+.std-row input { position: absolute; opacity: 0; pointer-events: none; }
+.std-row .cl-box { width: 17px; height: 17px; }
+.std-row input:checked ~ .std-info .std-code { background: var(--brand); color: #fff; border-color: transparent; }
+.std-info { min-width: 0; display: block; }
+.std-code {
+  display: inline-block; font-family: var(--mono); font-size: 11px; font-weight: 700;
+  padding: 1px 7px; border-radius: 6px; border: 1px solid var(--line-2);
+  color: var(--brand); background: var(--surface-3); margin-right: 6px; white-space: nowrap;
+  transition: all .18s;
+}
+.std-area { font-size: 11px; color: var(--text-3); font-weight: 600; vertical-align: middle; }
+.std-text { display: block; font-size: 13.2px; color: var(--text-2); line-height: 1.55; margin-top: 3px; }
+.std-empty { padding: 30px; text-align: center; color: var(--text-3); font-size: 13px; }
+
+.picked { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.picked-item {
+  display: flex; gap: 10px; align-items: flex-start;
+  background: var(--brand-soft); border: 1px solid transparent; border-radius: 12px; padding: 10px 12px;
+}
+.picked-item .x {
+  margin-left: auto; flex: none; cursor: pointer; appearance: none; background: none; border: 0;
+  color: var(--text-3); padding: 2px; border-radius: 6px; transition: all .15s; line-height: 0;
+}
+.picked-item .x:hover { background: var(--danger-soft); color: var(--danger); }
+.picked-item .x svg { width: 14px; height: 14px; }
+
+/* ---------- 14. 동적 리스트(반복 입력) ---------- */
+.rep-item {
+  display: flex; gap: 9px; align-items: flex-start; margin-bottom: 8px;
+  background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--r); padding: 10px;
+  animation: repIn .3s cubic-bezier(.2,.8,.3,1);
+}
+@keyframes repIn { from { opacity: 0; transform: translateY(-6px) scale(.99); } to { opacity: 1; transform: none; } }
+.rep-idx {
+  width: 24px; height: 24px; border-radius: 8px; flex: none; margin-top: 4px;
+  display: grid; place-items: center; font-size: 11.5px; font-weight: 800;
+  background: var(--surface-3); color: var(--text-3);
+}
+.rep-body { flex: 1; min-width: 0; display: grid; gap: 8px; }
+.rep-del {
+  appearance: none; background: none; border: 0; cursor: pointer; flex: none; margin-top: 4px;
+  color: var(--text-3); padding: 5px; border-radius: 8px; transition: all .15s; line-height: 0;
+}
+.rep-del:hover { background: var(--danger-soft); color: var(--danger); }
+.rep-del svg { width: 15px; height: 15px; }
+
+/* ---------- 15. 안내 박스 ---------- */
+.note {
+  border-radius: var(--r); padding: 13px 15px; font-size: 13px; line-height: 1.65;
+  border: 1px solid transparent; margin: 12px 0;
+}
+.note b { font-weight: 800; }
+.note-info { background: var(--brand-soft); color: var(--text-2); border-color: rgba(47,109,246,.16); }
+.note-ok   { background: var(--ok-soft); color: var(--text-2); border-color: rgba(16,163,127,.2); }
+.note-warn { background: var(--warn-soft); color: var(--text-2); border-color: rgba(230,137,42,.22); }
+.note-tip  { background: var(--surface-3); color: var(--text-2); border-color: var(--line); }
+.note .note-h { display: flex; align-items: center; gap: 7px; font-weight: 800; margin-bottom: 5px; font-size: 13px; }
+.note .note-h svg { width: 15px; height: 15px; flex: none; }
+
+.src {
+  font-size: 11.3px; color: var(--text-3); margin-top: 10px; padding-top: 9px;
+  border-top: 1px dashed var(--line); line-height: 1.55;
+}
+
+/* ---------- 16. 절차 다이어그램 ---------- */
+.flow { display: grid; gap: 12px; grid-template-columns: repeat(5, 1fr); margin: 6px 0 4px; }
+@media (max-width: 980px) { .flow { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 520px) { .flow { grid-template-columns: 1fr; } }
+.flow-node {
+  position: relative; background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--r); padding: 15px 14px; box-shadow: var(--shadow-1);
+  transition: transform .28s cubic-bezier(.2,.8,.3,1), box-shadow .28s, border-color .28s;
+  overflow: hidden;
+}
+.flow-node::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: linear-gradient(180deg, var(--brand), var(--brand-2));
+  transform: scaleY(0); transform-origin: top; transition: transform .35s cubic-bezier(.2,.9,.3,1);
+}
+.flow-node:hover { transform: translateY(-4px); box-shadow: var(--shadow-2); border-color: var(--line-2); }
+.flow-node:hover::before { transform: scaleY(1); }
+.flow-n { font-size: 11px; font-weight: 800; color: var(--brand); letter-spacing: .06em; }
+.flow-node h4 { font-size: 14px; margin: 3px 0 6px; letter-spacing: -.025em; }
+.flow-node ul { padding-left: 15px; margin: 0; }
+.flow-node li { font-size: 12.2px; color: var(--text-2); line-height: 1.55; }
+
+/* 2열 비교 */
+.vs { display: grid; grid-template-columns: 1fr auto 1fr; gap: 14px; align-items: stretch; }
+@media (max-width: 720px) { .vs { grid-template-columns: 1fr; } .vs-mid { display: none; } }
+.vs-col { background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; }
+.vs-col h4 { font-size: 14.5px; margin-bottom: 9px; display: flex; align-items: center; gap: 8px; }
+.vs-col h4::before { content: ""; width: 8px; height: 8px; border-radius: 3px; background: var(--brand); }
+.vs-col.alt h4::before { background: var(--brand-2); }
+.vs-col ul { padding-left: 16px; margin: 0; }
+.vs-col li { font-size: 12.8px; color: var(--text-2); }
+.vs-mid { display: grid; place-items: center; }
+.vs-mid span {
+  width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--surface-3); color: var(--text-3); font-size: 12px; font-weight: 800;
+  border: 1px solid var(--line);
+}
+
+/* 사고력 매트릭스 */
+.dokgrid { display: grid; gap: 9px; grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 760px) { .dokgrid { grid-template-columns: 1fr; } }
+.dok {
+  border-radius: var(--r); padding: 13px 14px; border: 1px solid var(--line);
+  background: var(--surface-2); transition: transform .25s, box-shadow .25s;
+}
+.dok:hover { transform: translateY(-3px); box-shadow: var(--shadow-2); }
+.dok-lv { font-size: 10.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.dok h5 { margin: 3px 0 5px; font-size: 14px; font-weight: 800; letter-spacing: -.02em; }
+.dok p { font-size: 12.2px; color: var(--text-2); margin: 0; line-height: 1.55; }
+.dok .kw { font-size: 11.5px; color: var(--text-3); margin-top: 7px; display: block; }
+.dok.l1 { border-left: 3px solid #7a86a3; } .dok.l1 .dok-lv { color: #7a86a3; }
+.dok.l2 { border-left: 3px solid var(--brand-3); } .dok.l2 .dok-lv { color: var(--brand-3); }
+.dok.l3 { border-left: 3px solid var(--brand); } .dok.l3 .dok-lv { color: var(--brand); }
+.dok.l4 { border-left: 3px solid var(--brand-2); } .dok.l4 .dok-lv { color: var(--brand-2); }
+
+/* ---------- 17. 미리보기 문서 ---------- */
+.doc {
+  background: #fff; color: #16233d; border-radius: var(--r);
+  border: 1px solid var(--line); padding: 30px 32px; box-shadow: var(--shadow-1);
+  font-size: 13.6px; line-height: 1.72;
+}
+html[data-theme="dark"] .doc { background: #f7f9fd; }
+.doc h2, .doc h3, .doc h4 { color: #0f1c33; }
+.doc-title {
+  text-align: center; font-size: 19px; font-weight: 800; letter-spacing: -.03em;
+  padding-bottom: 14px; margin-bottom: 18px; border-bottom: 2.5px solid #1b2b4b;
+}
+.doc-title small { display: block; font-size: 12px; font-weight: 600; color: #5a6889; margin-top: 5px; letter-spacing: 0; }
+.doc-meta { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border: 1px solid #ccd6e8; border-radius: 8px; overflow: hidden; margin-bottom: 18px; }
+@media (max-width: 700px) { .doc-meta { grid-template-columns: repeat(2, 1fr); } }
+.doc-meta div { padding: 8px 11px; border-right: 1px solid #e2e9f4; border-bottom: 1px solid #e2e9f4; }
+.doc-meta div:nth-child(4n) { border-right: 0; }
+.doc-meta dt { font-size: 10.5px; font-weight: 800; color: #6b7896; letter-spacing: .02em; margin: 0; }
+.doc-meta dd { margin: 1px 0 0; font-size: 13px; font-weight: 600; color: #16233d; }
+.doc-sec { margin-bottom: 18px; }
+.doc-sec > h3 {
+  font-size: 14px; font-weight: 800; margin-bottom: 8px; padding-left: 10px;
+  border-left: 4px solid #2f6df6; letter-spacing: -.02em;
+}
+.doc table { font-size: 12.6px; border: 1px solid #ccd6e8; }
+.doc th, .doc td { border: 1px solid #e2e9f4; padding: 7px 9px; color: #16233d; }
+.doc thead th { background: #eef3fb; color: #33415e; position: static; }
+.doc tbody tr:hover { background: transparent; }
+.doc .doc-block {
+  background: #f5f8fd; border: 1px solid #dde6f4; border-radius: 8px;
+  padding: 12px 14px; white-space: pre-wrap; word-break: break-word;
+}
+.doc .doc-cond { background: #fffaf2; border: 1px solid #f0dcc0; }
+.doc .muted { color: #8794b0; font-style: italic; }
+.doc ul { padding-left: 18px; }
+.doc-foot { margin-top: 22px; padding-top: 12px; border-top: 1px dashed #ccd6e8; font-size: 11px; color: #7d8aa8; display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+
+/* ---------- 18. 프롬프트 출력 ---------- */
+.prompt-out {
+  font-family: var(--mono); font-size: 12.4px; line-height: 1.72;
+  background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--r);
+  padding: 16px 18px; white-space: pre-wrap; word-break: break-word;
+  max-height: 460px; overflow-y: auto; color: var(--text-2);
+}
+html[data-theme="dark"] .prompt-out { background: #0e1424; }
+
+/* 플랫폼 카드 */
+.plat-tabs { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 16px; }
+.plat-tab {
+  appearance: none; cursor: pointer; font-family: inherit; font-size: 12.8px; font-weight: 700;
+  display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 11px;
+  background: var(--surface-2); border: 1px solid var(--line); color: var(--text-2);
+  transition: all .2s cubic-bezier(.2,.8,.3,1);
+}
+.plat-tab:hover { transform: translateY(-1px); border-color: var(--line-2); color: var(--text); }
+.plat-tab.on { background: var(--brand-soft); border-color: var(--brand); color: var(--brand); }
+.plat-logo { width: 20px; height: 20px; border-radius: 6px; flex: none; display: grid; place-items: center; color: #fff; font-size: 10px; font-weight: 800; }
+.plat-panel { display: none; }
+.plat-panel.on { display: block; animation: panelIn .32s cubic-bezier(.2,.8,.3,1); }
+
+.steps { counter-reset: st; display: flex; flex-direction: column; gap: 0; }
+.step { position: relative; padding: 0 0 18px 42px; counter-increment: st; }
+.step::before {
+  content: counter(st); position: absolute; left: 0; top: 0;
+  width: 27px; height: 27px; border-radius: 9px; display: grid; place-items: center;
+  font-size: 12px; font-weight: 800; color: #fff;
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  box-shadow: 0 2px 8px rgba(47,109,246,.26);
+}
+.step::after {
+  content: ""; position: absolute; left: 13px; top: 30px; bottom: 2px; width: 2px;
+  background: linear-gradient(180deg, var(--line-2), transparent);
+}
+.step:last-child { padding-bottom: 0; }
+.step:last-child::after { display: none; }
+.step h5 { font-size: 14px; font-weight: 700; margin: 3px 0 5px; letter-spacing: -.02em; }
+.step p { font-size: 13px; color: var(--text-2); margin: 0 0 5px; }
+.step ul { padding-left: 17px; margin: 4px 0 0; }
+.step li { font-size: 12.6px; color: var(--text-2); }
+.step .path {
+  display: inline-block; font-family: var(--mono); font-size: 11.6px; font-weight: 600;
+  background: var(--surface-3); border: 1px solid var(--line); border-radius: 7px;
+  padding: 2px 8px; margin: 3px 3px 3px 0; color: var(--brand);
+}
+
+/* ---------- 18-b. 분할 버튼 · 드롭다운 ---------- */
+.split { position: relative; display: inline-flex; }
+.split .split-main { border-top-right-radius: 0; border-bottom-right-radius: 0; padding-right: 10px; }
+.split .split-caret {
+  border-top-left-radius: 0; border-bottom-left-radius: 0;
+  padding: 8px 7px; margin-left: 1px;
+}
+.split .split-caret svg { width: 13px; height: 13px; transition: transform .25s cubic-bezier(.2,.9,.3,1); }
+.split.open .split-caret svg { transform: rotate(180deg); }
+
+.menu {
+  position: absolute; top: calc(100% + 8px); right: 0; z-index: 90;
+  min-width: 254px; padding: 6px; border-radius: 14px;
+  background: var(--surface); border: 1px solid var(--line);
+  box-shadow: var(--shadow-3);
+  opacity: 0; transform: translateY(-8px) scale(.97); pointer-events: none;
+  transition: opacity .18s, transform .24s cubic-bezier(.2,.9,.3,1);
+}
+.split.open .menu { opacity: 1; transform: none; pointer-events: auto; }
+.menu-label {
+  font-size: 10.5px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--text-3); padding: 7px 10px 4px;
+}
+.menu-sep { height: 1px; background: var(--line); margin: 5px 4px; }
+.menu-item {
+  width: 100%; appearance: none; background: none; border: 0; cursor: pointer;
+  display: flex; align-items: center; gap: 9px; text-align: left;
+  font-family: inherit; font-size: 13px; font-weight: 600; color: var(--text-2);
+  padding: 9px 10px; border-radius: 10px; transition: background-color .15s, color .15s;
+}
+.menu-item:hover { background: var(--surface-3); color: var(--text); }
+.menu-item svg { width: 16px; height: 16px; flex: none; color: var(--brand); }
+.menu-item em { margin-left: auto; font-style: normal; font-size: 11px; color: var(--text-3); font-weight: 600; }
+
+/* 내보내기 도구 모음 */
+.exportbar {
+  display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+  padding: 10px 12px; margin-bottom: 14px;
+  background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--r);
+}
+.exportbar .eb-label { font-size: 12px; font-weight: 700; color: var(--text-3); margin-right: auto; }
+
+/* 인쇄 전용 호스트 */
+#printHost { display: none; }
+
+/* ---------- 19. 토스트 ---------- */
+#toast {
+  position: fixed; left: 50%; bottom: 30px; transform: translate(-50%, 24px);
+  z-index: 200; opacity: 0; pointer-events: none;
+  background: var(--text); color: var(--bg);
+  padding: 11px 20px; border-radius: 12px; font-size: 13.5px; font-weight: 700;
+  box-shadow: var(--shadow-3); display: flex; align-items: center; gap: 9px;
+  transition: opacity .28s, transform .34s cubic-bezier(.2,.9,.3,1);
+  max-width: min(90vw, 460px);
+}
+#toast.show { opacity: 1; transform: translate(-50%, 0); }
+#toast svg { width: 16px; height: 16px; flex: none; }
+
+/* ---------- 20. 플로팅 액션 ---------- */
+.fab-wrap { position: fixed; right: 22px; bottom: 22px; z-index: 70; display: flex; flex-direction: column; align-items: flex-end; gap: 9px; }
+.fab-menu { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+.fab-menu .btn {
+  opacity: 0; transform: translateY(10px) scale(.9); pointer-events: none;
+  transition: opacity .24s, transform .3s cubic-bezier(.2,.9,.3,1);
+  box-shadow: var(--shadow-2);
+}
+.fab-wrap.open .fab-menu .btn { opacity: 1; transform: none; pointer-events: auto; }
+.fab-wrap.open .fab-menu .btn:nth-child(1) { transition-delay: .02s; }
+.fab-wrap.open .fab-menu .btn:nth-child(2) { transition-delay: .06s; }
+.fab-wrap.open .fab-menu .btn:nth-child(3) { transition-delay: .10s; }
+.fab-wrap.open .fab-menu .btn:nth-child(4) { transition-delay: .14s; }
+.fab {
+  width: 52px; height: 52px; border-radius: 17px; border: 0; cursor: pointer;
+  display: grid; place-items: center; color: #fff;
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  box-shadow: 0 6px 22px rgba(47,109,246,.42);
+  transition: transform .3s cubic-bezier(.2,.9,.3,1), box-shadow .25s;
+}
+.fab:hover { transform: translateY(-2px) scale(1.04); box-shadow: 0 10px 30px rgba(47,109,246,.5); }
+.fab svg { width: 23px; height: 23px; transition: transform .34s cubic-bezier(.2,.9,.3,1); }
+.fab-wrap.open .fab svg { transform: rotate(135deg); }
+
+/* ---------- 21. 유틸 ---------- */
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.row.end { justify-content: flex-end; }
+.row.between { justify-content: space-between; }
+.mt0 { margin-top: 0 } .mt8 { margin-top: 8px } .mt12 { margin-top: 12px } .mt16 { margin-top: 16px } .mt24 { margin-top: 24px }
+.mb0 { margin-bottom: 0 } .mb8 { margin-bottom: 8px } .mb12 { margin-bottom: 12px } .mb16 { margin-bottom: 16px }
+.muted { color: var(--text-3); }
+.tiny { font-size: 11.6px; }
+.tag {
+  display: inline-block; font-size: 11px; font-weight: 800; padding: 2px 8px;
+  border-radius: 99px; background: var(--surface-3); color: var(--text-3); letter-spacing: -.01em;
+}
+.tag.b { background: var(--brand-soft); color: var(--brand); }
+.tag.g { background: var(--ok-soft); color: var(--ok); }
+.tag.o { background: var(--warn-soft); color: var(--warn); }
+.tag.p { background: var(--brand-soft-2); color: var(--brand-2); }
+.divider { height: 1px; background: var(--line); border: 0; margin: 18px 0; }
+.center { text-align: center; }
+.nowrap { white-space: nowrap; }
+
+/* ---------- 22. 인쇄 (PDF 저장) ---------- */
+@media print {
+  @page { size: A4; margin: 12mm 11mm; }
+  html, body { background: #fff !important; color: #000 !important; }
+  #bgfx, #bgcanvas, .topbar, .tabbar, .fab-wrap, #toast, .no-print { display: none !important; }
+  .wrap { max-width: none; padding: 0; }
+  .panel { display: none !important; }
+  .panel.print-target, .panel.print-target * { visibility: visible; }
+  .panel.print-target { display: block !important; animation: none; }
+  body.print-all .panel { display: block !important; animation: none; }
+  body.print-all .panel + .panel { break-before: page; page-break-before: always; }
+  .card, .acc, .doc, .tablewrap, .flow-node, .note { break-inside: avoid; page-break-inside: avoid; box-shadow: none !important; }
+  .card { border-color: #ccc !important; }
+  .hero { background: #eef3fb !important; color: #16233d !important; box-shadow: none !important; }
+  .hero::before, .hero::after { display: none !important; }
+  .hero-badge, .hero-stat { background: #fff !important; border-color: #ccd6e8 !important; color: #16233d !important; }
+  .std-list { max-height: none !important; overflow: visible !important; }
+  .prompt-out { max-height: none !important; overflow: visible !important; background: #f7f9fd !important; color: #16233d !important; }
+  .acc-body { display: block !important; }
+  .plat-panel { display: block !important; break-before: page; }
+  .plat-tabs { display: none !important; }
+  body.print-node .topbar, body.print-node .tabbar, body.print-node main.wrap,
+  body.print-node footer, body.print-node .fab-wrap { display: none !important; }
+  body.print-node #printHost { display: block !important; }
+  body.print-node #printHost .plat-panel { break-before: auto; }
+  #printHost .exportbar, #printHost .no-print { display: none !important; }
+  input, textarea, select { border-color: #ccc !important; background: #fff !important; color: #000 !important; }
+  a { color: #000 !important; text-decoration: none !important; }
+  h2, h3, h4 { break-after: avoid; page-break-after: avoid; }
+}
+
+/* 반응형 보정 */
+@media (max-width: 560px) {
+  .hide-sm { display: none; }
+  .topbar-inner, .tabbar-inner, .wrap { padding-left: 14px; padding-right: 14px; }
+  .brand-sub { display: none; }
+  .hero { padding: 26px 20px; border-radius: var(--r-lg); }
+  .card { padding: 17px; border-radius: var(--r); }
+  .doc { padding: 20px 18px; }
+  .std-toolbar { grid-template-columns: 1fr; }
+  .fab-wrap { right: 14px; bottom: 14px; }
+}
+
+/* 접근성 */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+  html { scroll-behavior: auto; }
+}
+.sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+</style>
+</head>
+<body>
+
+<div id="bgfx"></div>
+<canvas id="bgcanvas"></canvas>
+
+<!-- SVG 정의 -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="var(--brand)"/>
+      <stop offset="60%" stop-color="var(--brand-2)"/>
+      <stop offset="100%" stop-color="var(--brand-3)"/>
+    </linearGradient>
+    <linearGradient id="flowGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="var(--brand)"/>
+      <stop offset="50%" stop-color="var(--brand-2)"/>
+      <stop offset="100%" stop-color="var(--brand-3)"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<!-- ============ 상단 바 ============ -->
+<header class="topbar no-print">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="brand-logo">
+        <svg viewBox="0 0 100 100" fill="none" aria-hidden="true">
+          <path d="M38 22h30a6 6 0 0 1 6 6v44a6 6 0 0 1-6 6H38" stroke="#fff" stroke-width="7" stroke-linecap="round"/>
+          <path d="M38 22a10 10 0 0 0 0 20h10" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M38 78a10 10 0 0 1 0-20h10" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="50" cy="50" r="6.5" fill="#fff"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <div class="brand-title">송쌤과학 서논술형 평가 계획 및 문항 개발</div>
+        <div class="brand-sub">2022 개정 교육과정 과학과 · 성취기준 473개 탑재</div>
+      </div>
+    </div>
+    <div class="topbar-tools">
+      <div class="split" id="saveSplit">
+        <button class="btn btn-sm btn-primary split-main" id="btnSaveAll" title="모든 메뉴의 작업 내용을 한 번에 저장합니다 (Ctrl+S)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
+          <span>전체 저장</span>
+        </button>
+        <button class="btn btn-sm btn-primary split-caret" id="btnSaveMenu" aria-haspopup="true" aria-expanded="false" aria-label="다른 형식으로 저장">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="menu" id="saveMenu" role="menu">
+          <div class="menu-label">전체 내용 저장</div>
+          <button class="menu-item" data-save="pdf" role="menuitem">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+            전체 PDF로 저장<em>5개 메뉴 전부</em></button>
+          <button class="menu-item" data-save="word" role="menuitem">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13l1.6 5 2.4-7 2.4 7L16 13"/></svg>
+            전체 Word로 저장<em>.doc · 편집 가능</em></button>
+          <button class="menu-item" data-save="png" role="menuitem">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+            현재 메뉴 이미지로 저장<em>PNG</em></button>
+          <div class="menu-sep"></div>
+          <div class="menu-label">작업 파일</div>
+          <button class="menu-item" data-save="json" role="menuitem">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+            내보내기<em>.json</em></button>
+          <button class="menu-item" data-save="load" role="menuitem">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 8l5-5 5 5M12 3v12"/></svg>
+            불러오기<em>.json</em></button>
+        </div>
+      </div>
+      <button class="btn btn-icon" id="themeToggle" title="라이트/다크 모드 전환" aria-label="테마 전환">
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.4M12 19.6V22M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2 12h2.4M19.6 12H22M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7"/></svg>
+        <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ============ 탭 ============ -->
+<nav class="tabbar no-print" aria-label="주요 메뉴">
+  <div class="tabbar-inner" id="tabbar">
+    <button class="tab active" data-panel="p1"><span class="tab-num">1</span>평가의 이해</button>
+    <button class="tab" data-panel="p2"><span class="tab-num">2</span>평가 계획 수립</button>
+    <button class="tab" data-panel="p3"><span class="tab-num">3</span>문항·도구 제작</button>
+    <button class="tab" data-panel="p4"><span class="tab-num">4</span>채점기준표 제작</button>
+    <button class="tab" data-panel="p5"><span class="tab-num">5</span>평가 에이전트 만들기</button>
+    <div id="tabInk"></div>
+  </div>
+</nav>
+
+<main class="wrap">
+
+<!-- ================================================================
+     1. 서·논술형 평가의 이해
+     ================================================================ -->
+<section class="panel active" id="p1" data-title="서·논술형 평가의 이해">
+
+  <div class="hero">
+    <div class="hero-badge">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="width:14px;height:14px"><path d="M12 3l2.4 5.6L20 10l-4.4 3.6L17 20l-5-3.2L7 20l1.4-6.4L4 10l5.6-1.4z"/></svg>
+      서울·경기교육청 서·논술형 평가 자료 기반 정리
+    </div>
+    <h1>수업에서 배운 만큼, 글로 생각하게 하는 평가</h1>
+    <p>서·논술형 평가는 학생이 답을 <b>고르는</b> 평가가 아니라 <b>구성하는</b> 평가입니다. 아는 만큼 쓰기 때문에 교사는 학생이 무엇을 어디까지 이해했는지 볼 수 있고, 학생은 쓰는 과정에서 한 번 더 배웁니다. 이 메뉴는 평가를 시작하기 전 반드시 정리해야 할 개념·절차·점검 항목을 담았습니다.</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><b>5단계</b><span>평가 운영 절차</span></div>
+      <div class="hero-stat"><b>5영역</b><span>단계별 점검 프로세스</span></div>
+      <div class="hero-stat"><b>473개</b><span>과학과 성취기준</span></div>
+      <div class="hero-stat"><b>19종</b><span>반응 지시어</span></div>
+    </div>
+  </div>
+
+  <!-- 1-1 개념 -->
+  <div class="section-title">01. 서·논술형 평가란 무엇인가</div>
+  <div class="card">
+    <div class="card-head">
+      <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+      <div><h2>정의와 목적</h2><p class="desc">무엇을 재는 평가인지 먼저 합의해야 문항이 흔들리지 않습니다.</p></div>
+    </div>
+    <div class="grid g2">
+      <div class="note note-info">
+        <div class="note-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>정의</div>
+        지식에 대한 심층적 이해와 탐구, 분석과 판단 등의 <b>사고 과정</b>을 학생이 자신의 언어로 논리적으로 기술하도록 하는 평가.
+      </div>
+      <div class="note note-ok">
+        <div class="note-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>목적</div>
+        분석적 이해력·비판적 사고력·창의적 문제해결력 등 <b>고등 사고력</b>을 기르고, 학생의 현재 배움 상태를 드러내어 <b>피드백으로 성장</b>을 돕는 것.
+      </div>
+    </div>
+
+    <div class="section-title" style="margin-top:22px">서술형 문항 vs 논술형 문항</div>
+    <div class="vs">
+      <div class="vs-col">
+        <h4>서술형 문항</h4>
+        <ul>
+          <li>학습한 지식·개념·원리를 <b>정확한 문장 수준</b>으로 쓰게 함</li>
+          <li>분량: 한 문장 ~ 서너 문장</li>
+          <li>내용: 정의·예시·비교·대조·나열·분류·인과·분석</li>
+          <li>정답이 비교적 분명하고 유사 정답을 허용</li>
+        </ul>
+      </div>
+      <div class="vs-mid"><span>VS</span></div>
+      <div class="vs-col alt">
+        <h4>논술형 문항</h4>
+        <ul>
+          <li>주장과 근거를 <b>논리 구조를 갖춘 문단·글 수준</b>으로 쓰게 함</li>
+          <li>분량: 한 문단 ~ 한 편의 글</li>
+          <li>내용: 제안·해결 방안·비평·증명·논증</li>
+          <li>정답이 하나가 아니라 다양한 응답이 가능</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section-title" style="margin-top:22px">제한형 논술 / 확장형 논술</div>
+    <div class="tablewrap">
+      <table class="compact">
+        <thead><tr><th style="width:130px">구분</th><th>제한형 논술</th><th>확장형 논술</th></tr></thead>
+        <tbody>
+          <tr><td><b>응답 길이</b></td><td>한 문장 이상</td><td>한 문단 이상</td></tr>
+          <tr><td><b>응답 양식</b></td><td>분량·내용 범위·서술 양식 등을 조건으로 제한</td><td>응답의 자유도를 허용(필요 시 일부 제한 가능)</td></tr>
+          <tr><td><b>글의 완성도</b></td><td>서술의 깊이·넓이·정확성을 요구</td><td>주장의 완결성·완성도·논리적 글쓰기를 요구</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="src">출처 정리 : 서울특별시교육청 「수업과 연계한 과학과 서·논술형 평가 실천하기」(2022), 경기도교육청 「2025 중등 논술형 평가 길라잡이」, 「서·논술형 평가 도구 개발의 방법과 사례 – 과학」의 내용을 재구성함.</p>
+  </div>
+
+  <!-- 1-2 절차 -->
+  <div class="section-title">02. 서·논술형 평가 절차</div>
+  <div class="card">
+    <div class="card-head">
+      <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h12"/></svg></div>
+      <div><h2>평가는 한 번의 시험이 아니라 다섯 단계의 흐름입니다</h2><p class="desc">성취기준 분석에서 시작해 피드백과 성찰로 닫히는 순환 구조입니다.</p></div>
+    </div>
+
+    <div id="flowDiagram" class="mb16"></div>
+
+    <div class="flow">
+      <div class="flow-node">
+        <div class="flow-n">STEP 01</div><h4>성취기준 분석</h4>
+        <ul><li>성취기준·성취수준(평가기준) 분석</li><li>지식·이해 / 과정·기능 / 가치·태도 확인</li><li>필요 시 교육과정 재구성</li></ul>
+      </div>
+      <div class="flow-node">
+        <div class="flow-n">STEP 02</div><h4>교수·학습 및 평가 계획</h4>
+        <ul><li>평가 요소 도출 · 평가 방법 선정</li><li>본질적 목표와 핵심 질문 설정</li><li>학기 초 계획 공지</li></ul>
+      </div>
+      <div class="flow-node">
+        <div class="flow-n">STEP 03</div><h4>평가 도구 개발</h4>
+        <ul><li>발문·자료·조건으로 문항 구성</li><li>채점기준표를 <b>문항과 함께</b> 개발</li><li>교과협의회 공동 검토</li></ul>
+      </div>
+      <div class="flow-node">
+        <div class="flow-n">STEP 04</div><h4>평가 시행 및 채점</h4>
+        <ul><li>동일한 시행 여건 확보</li><li>익명 채점 · 복수 채점</li><li>채점자 간·내 신뢰도 확보</li></ul>
+      </div>
+      <div class="flow-node">
+        <div class="flow-n">STEP 05</div><h4>결과 처리 · 피드백 · 기록</h4>
+        <ul><li>채점기준과 연결한 구체적 피드백</li><li>목표 참조 / 자기 참조 피드백</li><li>다음 수업 설계에 반영</li></ul>
+      </div>
+    </div>
+
+    <div class="note note-tip mt16">
+      <div class="note-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"/></svg>수업–평가 연계 3지점</div>
+      서울시교육청 자료는 수업과 평가가 만나는 지점을 <b>① 평가 계획 수립 ② 평가 도구 개발 ③ 평가 결과 피드백</b> 세 곳으로 봅니다. 각 지점에서 아래 네 가지 방향을 지켜야 평가가 수업의 연장선이 됩니다.
+    </div>
+
+    <div class="grid g2 mt12">
+      <div class="vs-col">
+        <h4>이해와 전이를 위한 수업·평가 방향 설정</h4>
+        <ul>
+          <li>수업을 통해 도달해야 할 <b>본질적 목표</b>와 질문(지식·기능·태도를 포괄) 설정</li>
+          <li>실생활 맥락에서 지식을 탐구·적용하도록 구체적 과제 상황과 학습 경험 계획</li>
+        </ul>
+      </div>
+      <div class="vs-col alt">
+        <h4>교육과정 맵핑에 근거한 수업·평가 설계</h4>
+        <ul>
+          <li>일부 성취기준만 분절적으로 다루지 말고 <b>교육과정 전체 맥락</b>에서 이해</li>
+          <li>필요하면 관련 성취기준을 통합·재배열하여 교육과정 재구성</li>
+        </ul>
+      </div>
+      <div class="vs-col">
+        <h4>성취기준에 근거한 평가 과제·채점기준표 개발</h4>
+        <ul>
+          <li>성취기준 해석 → 학습 요소 추출 → <b>과제와 채점기준표를 함께 구안</b></li>
+          <li>평가 과제는 <b>상황·자료·성취기준(평가 요소)</b> 세 범주를 고려</li>
+          <li>채점기준표는 분석적 채점과 총체적 채점의 관점을 함께 고려</li>
+        </ul>
+      </div>
+      <div class="vs-col alt">
+        <h4>학습자의 성장을 유도하는 학습 경험·피드백</h4>
+        <ul>
+          <li>학습자 특성을 고려한 <b>비계(scaffolding)</b>와 피드백 제공</li>
+          <li>목표 참조·자기 참조 피드백 + 정서적 피드백을 함께</li>
+          <li>교사평가·동료평가·자기평가를 다양하게 활용해 평가 피로도를 낮춤</li>
+        </ul>
+      </div>
+    </div>
+    <p class="src">출처 정리 : 서울특별시교육청 「수업과 연계한 과학과 서·논술형 평가 실천하기」(2022) 총론 ‘수업과 연계한 서·논술형 평가, 이렇게 하세요!’ 및 경기도교육청 「2025 중등 논술형 평가 길라잡이」 ‘논술형 평가의 운영’ 부분을 재구성함.</p>
+  </div>
+
+  <!-- 1-3 문항 구성 요소 -->
+  <div class="section-title">03. 문항은 무엇으로 이루어지는가</div>
+  <div class="card">
+    <div class="card-head">
+      <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
+      <div><h2>발문 · 자료 · 조건</h2><p class="desc">이 셋이 서로 어긋나면 학생은 무엇을 써야 할지 모르고, 교사는 무엇을 채점할지 모릅니다.</p></div>
+    </div>
+    <div class="grid g3">
+      <div class="dok l3">
+        <div class="dok-lv">Element 01</div><h5>발문</h5>
+        <p>학생이 <b>무엇에 대해 어떻게</b> 응답해야 하는지 분명히 알 수 있도록 문두에 제시. 측정하려는 능력이 드러나는 반응 지시어를 사용합니다.</p>
+        <span class="kw">간접 발문(상황 안내) + 직접 발문(요구)으로 나눌 수 있음</span>
+      </div>
+      <div class="dok l2">
+        <div class="dok-lv">Element 02</div><h5>자료(보기·제시문)</h5>
+        <p>문제 상황을 분명히 파악하고 구체적인 답안 작성에 도움이 되도록 제시. 발문과 긴밀히 연관되어야 하며 신뢰성·정확성에 유의합니다.</p>
+        <span class="kw">문제 해결 시간을 고려해 과다한 정보는 피할 것</span>
+      </div>
+      <div class="dok l4">
+        <div class="dok-lv">Element 03</div><h5>조건</h5>
+        <p>학생이 응답할 <b>내용과 형식의 범위</b>를 적절히 한정. 조건에 정답 전체나 일부가 암시되지 않도록 주의합니다.</p>
+        <span class="kw">조건의 제약 요소는 반드시 채점기준에 반영할 것</span>
+      </div>
+    </div>
+    <div class="note note-warn mt16">
+      <div class="note-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>가장 자주 나오는 두 가지 결함</div>
+      ① <b>자료에 결론이 남아 있는 경우</b> — 학생이 자료의 문장을 그대로 옮겨 적으면 정답이 되어 사고를 요구하지 못합니다.<br>
+      ② <b>조건과 채점기준이 어긋난 경우</b> — 조건으로 요구한 것이 채점 요소에 없거나, 채점기준에만 있는 요구를 조건에 쓰지 않았을 때 채점 분쟁이 생깁니다.
+    </div>
+  </div>
+
+  <!-- 1-4 사고의 수준 -->
+  <div class="section-title">04. 어떤 사고를 요구할 것인가</div>
+  <div class="card">
+    <div class="card-head">
+      <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 0-4 12.7V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.3A7 7 0 0 0 12 2z"/><path d="M9 22h6"/></svg></div>
+      <div><h2>사고의 범위와 수준</h2><p class="desc">‘무엇을 아는가’가 아니라 ‘무엇을 할 수 있는가’를 묻기 위한 좌표입니다.</p></div>
+    </div>
+    <p class="mb12" style="font-size:13.4px;color:var(--text-2)">단순 기억에 의존해 답할 수 있는 내용을 묻는 것은 지양합니다. 아래 인지 과정의 <b>상위 수준</b>에 해당하는 사고 기술을 문항에 담으십시오.</p>
+    <div class="dokgrid" id="dokGrid"></div>
+
+    <div class="section-title" style="margin-top:22px">고등 사고력의 7범주</div>
+    <div class="tablewrap">
+      <table class="compact">
+        <thead><tr><th style="width:110px">계열</th><th style="width:130px">범주</th><th>세부 사고</th></tr></thead>
+        <tbody>
+          <tr><td rowspan="3"><span class="tag b">논리적 사고<br>(비판적 사고)</span></td><td><b>분석적 사고</b></td><td>개념적 분석 · 텍스트 분석</td></tr>
+          <tr><td><b>추론적 사고</b></td><td>분석적 추론(연역) · 종합적 추론(귀납) · 논리 퍼즐</td></tr>
+          <tr><td><b>종합적 사고</b></td><td>의사 결정 · 상황 추리</td></tr>
+          <tr><td rowspan="4"><span class="tag p">창의적 사고<br>(기호적 사고)</span></td><td><b>대안적 사고</b></td><td>관점·발상 전환 · 대안 창안</td></tr>
+          <tr><td><b>발산적 사고</b></td><td>시야·시계 확장 · 재정의</td></tr>
+          <tr><td><b>상징적 사고</b></td><td>유창성 · 융통성 · 독창성 · 정교성</td></tr>
+          <tr><td colspan="2" class="muted tiny">※ 김영정(2006) 「&lt;사고와 논술&gt; 지도를 위한 준비 과정」을 요약함.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-title" style="margin-top:22px">반응 지시어 사전 <span class="tag b" style="text-transform:none;letter-spacing:0">발문 작성에 그대로 활용</span></div>
+    <div class="row mb12">
+      <input type="text" id="verbSearch" placeholder="지시어 또는 의미로 검색 (예: 비교, 근거, 추론)" style="max-width:340px">
+      <span class="tiny muted" id="verbCount"></span>
+    </div>
+    <div class="tablewrap" style="max-height:360px;overflow-y:auto">
+      <table class="compact"><thead><tr><th style="width:110px">반응 지시어</th><th>의미</th><th style="width:120px">주 사고 수준</th></tr></thead>
+      <tbody id="verbTable"></tbody></table>
+    </div>
+    <p class="src">출처 정리 : 경기도교육청 「2025 중등 논술형 평가 길라잡이」의 반응 지시어 표와 Anderson의 신교육목표분류 인지 과정을 과학과 맥락에 맞게 재구성함.</p>
+  </div>
+
+  <!-- 1-5 단계별 점검 프로세스 -->
+  <div class="section-title">05. 단계별 점검 프로세스</div>
+  <div class="card">
+    <div class="card-head">
+      <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+      <div>
+        <h2>평가 계획부터 피드백까지, 단계마다 확인하기</h2>
+        <p class="desc">체크한 내용은 브라우저에 자동 저장되며 PDF에도 그대로 인쇄됩니다.</p>
+      </div>
+      <div class="card-head-tools">
+        <button class="btn btn-sm no-print" id="procExpand">모두 펼치기</button>
+        <button class="btn btn-sm btn-danger no-print" data-reset-check="proc">체크 초기화</button>
+      </div>
+    </div>
+    <div class="progress-head">
+      <div class="ring" id="procRing"><svg viewBox="0 0 40 40"><circle class="bgc" cx="20" cy="20" r="16"/><circle class="fgc" cx="20" cy="20" r="16"/></svg><b>0%</b></div>
+      <div style="flex:1">
+        <div class="row between mb8"><span style="font-size:13px;font-weight:700">전체 점검 진행률</span><span class="progress-num" id="procNum">0 / 0</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="procFill"></div></div>
+      </div>
+    </div>
+    <div id="procAcc"></div>
+    <p class="src">출처 정리 : 서울특별시교육청 「수업과 연계한 과학과 서·논술형 평가 실천하기」(2022)의 ‘서·논술형 평가 단계별 점검’ 표(박혜영, 2020, KICE ORM 2020-3-2 발췌·정리분)와 경기도교육청 「2025 중등 논술형 평가 길라잡이」의 문항·채점기준표 점검 항목을 통합하여 재구성함.</p>
+  </div>
+
+  <!-- 1-6 성취수준 -->
+  <div class="section-title">06. 성취수준 체계 이해하기</div>
+  <div class="card">
+    <div class="card-head">
+      <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h4V10H3zM10 20h4V4h-4zM17 20h4v-7h-4z"/></svg></div>
+      <div><h2>A~E 5수준 / A~C 3수준</h2><p class="desc">채점기준표의 척도를 정할 때 근거가 되는 일반적 특성입니다.</p></div>
+    </div>
+    <div class="tablewrap">
+      <table class="compact">
+        <thead><tr><th style="width:70px">성취수준</th><th>일반적 특성</th><th style="width:110px">성취율</th></tr></thead>
+        <tbody>
+          <tr><td class="num"><span class="tag g">A</span></td><td>개념 이해가 깊고 지식 전이 수준이 매우 높음. 배운 지식을 다양하고 복잡한 맥락에 적용하며, 연계된 기능 수행이 매우 능숙함.</td><td class="num">90% 이상</td></tr>
+          <tr><td class="num"><span class="tag b">B</span></td><td>개념 이해와 지식 전이 수준이 높은 편. 다양한 맥락에 적용하고 연계된 기능 수행이 능숙한 편.</td><td class="num">80~90%</td></tr>
+          <tr><td class="num"><span class="tag">C</span></td><td>개념 이해와 지식 전이 수준이 보통. 일부 맥락에 적용하고 기능 수행이 중간 수준.</td><td class="num">70~80%</td></tr>
+          <tr><td class="num"><span class="tag o">D</span></td><td>위계가 낮은 개념을 이해하고 지식 습득이 다소 제한적. 제한된 맥락에 적용하며 기능의 기본 부분을 수행.</td><td class="num">60~70%</td></tr>
+          <tr><td class="num"><span class="tag o">E</span></td><td>위계가 낮은 개념을 일부 이해하고 지식 습득이 제한적. 연계된 기능의 일부를 수행.</td><td class="num">40~60%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note note-info mt12">
+      <b>척도 설계 팁</b> · 성취수준이 5단계라도 채점기준의 척도(배점)를 반드시 5단계로 맞출 필요는 없습니다. 수준의 수는 <b>3~6개</b>가 적절하며, 학생 응답이 실제로 변별되는 지점을 기준으로 정하십시오.
+    </div>
+  </div>
+
+</section>
+
+<!-- ================================================================
+     2. 서·논술형 평가 계획 수립
+     ================================================================ -->
+<section class="panel" id="p2" data-title="서·논술형 평가 계획">
+
+  <div class="hero">
+    <div class="hero-badge">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="width:14px;height:14px"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      STEP 1 · 무엇을, 왜, 어떻게 평가할지 먼저 정합니다
+    </div>
+    <h1>서·논술형 평가 계획 수립</h1>
+    <p>성취기준을 고르고 → 지식·이해 / 과정·기능 / 가치·태도로 분해하고 → ‘~하기’ 형태의 평가 요소를 뽑는 순서로 작성하십시오. 여기서 뽑은 평가 요소가 3번 메뉴의 <b>문항</b>과 4번 메뉴의 <b>채점 요소</b>로 그대로 이어집니다.</p>
+  </div>
+
+  <!-- 2-1 기본 정보 -->
+  <div class="section-title">01. 기본 정보</div>
+  <div class="card">
+    <div class="card-head">
+      <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+      <div><h2>학교 · 교사 · 학급 정보</h2><p class="desc">여기에 입력한 내용은 3·4번 메뉴의 문서 머리글에도 자동으로 반영됩니다.</p></div>
+    </div>
+    <div class="grid g4">
+      <div class="field"><label for="f_school">학교 이름</label><input type="text" id="f_school" data-k="school" placeholder="예) 송쌤중학교"></div>
+      <div class="field"><label for="f_teacher">선생님 이름</label><input type="text" id="f_teacher" data-k="teacher" placeholder="예) 송세호"></div>
+      <div class="field"><label for="f_grade">수업 학년</label>
+        <select id="f_grade" data-k="grade">
+          <option value="">선택</option>
+          <optgroup label="초등학교"><option>3학년</option><option>4학년</option><option>5학년</option><option>6학년</option></optgroup>
+          <optgroup label="중학교"><option>중학교 1학년</option><option>중학교 2학년</option><option>중학교 3학년</option></optgroup>
+          <optgroup label="고등학교"><option>고등학교 1학년</option><option>고등학교 2학년</option><option>고등학교 3학년</option></optgroup>
+        </select>
+      </div>
+      <div class="field"><label for="f_class">학급 / 대상</label><input type="text" id="f_class" data-k="klass" placeholder="예) 3학년 1~6반 / 178명"></div>
+      <div class="field"><label for="f_subject">과목명</label><input type="text" id="f_subject" data-k="subject" placeholder="예) 과학"></div>
+      <div class="field"><label for="f_semester">학년도 / 학기</label><input type="text" id="f_semester" data-k="semester" placeholder="예) 2026학년도 1학기"></div>
+      <div class="field"><label for="f_unit">단원 / 영역</label><input type="text" id="f_unit" data-k="unit" placeholder="예) Ⅲ. 물질의 특성"></div>
+      <div class="field"><label for="f_topic">평가(과제)명</label><input type="text" id="f_topic" data-k="topic" placeholder="예) 혼합물 분리 실험 설계 보고서"></div>
+      <div class="field"><label for="f_when">평가 시기</label><input type="text" id="f_when" data-k="when" placeholder="예) 5월 3주 (4차시 중 3~4차시)"></div>
+      <div class="field"><label for="f_type">평가 유형</label>
+        <select id="f_type" data-k="etype"><option value="">선택</option><option>수행평가</option><option>지필평가(정기고사)</option><option>형성평가</option><option>진단평가</option></select>
+      </div>
+      <div class="field"><label for="f_ratio">반영 비율</label><input type="text" id="f_ratio" data-k="ratio" placeholder="예) 학기 성적의 20%"></div>
+      <div class="field"><label for="f_score">총 배점</label><input type="text" id="f_score" data-k="score" placeholder="예) 20점"></div>
+    </div>
+    <div class="field mb0"><label for="f_council">교과(학년)협의회 협의 내용 · 일자</label>
+      <input type="text" id="f_council" data-k="council" placeholder="예) 2026.03.05. 과학과 교과협의회에서 평가 시기·배점·채점기준 협의 완료">
+      <p class="hint">평가 시기·횟수·반영 비율·채점기준은 교과(학년)협의회 협의를 거쳐 확정하고, 학기 초에 학생·학부모에게 공지해야 합니다.</p>
+    </div>
+  </div>
+
+  <!-- 2-2 성취기준 -->
+  <div class="section-title">02. 교육과정 성취기준 선택</div>
+  <div class="card">
+    <div class="card-head">
+      <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M6 12H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2l7-4v20l-7-4z"/><path d="M18 8a4 4 0 0 1 0 8"/></svg></div>
+      <div><h2>2022 개정 교육과정 과학과 성취기준</h2><p class="desc">학교급·과목·영역으로 좁힌 뒤 검색해 고르십시오. 여러 개를 선택할 수 있습니다.</p></div>
+      <div class="card-head-tools"><span class="tag b" id="stdPickCount2">0개 선택</span></div>
+    </div>
+    <div class="std-toolbar">
+      <select data-std="school" data-scope="plan"><option value="">전체 학교급</option></select>
+      <select data-std="subject" data-scope="plan"><option value="">전체 과목</option></select>
+      <select data-std="area" data-scope="plan"><option value="">전체 영역</option></select>
+      <input type="text" data-std="q" data-scope="plan" placeholder="성취기준 코드 또는 내용 검색">
+    </div>
+    <div class="std-list" data-std="list" data-scope="plan"></div>
+    <div class="picked" data-std="picked" data-scope="plan"></div>
+  </div>
+
+  <!-- 2-3 성취기준 분석 -->
+  <div class="section-title">03. 성취기준 분석</div>
+  <div class="card">
+    <div class="card-head">
+      <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div>
+      <div><h2>세 범주로 분해하기</h2><p class="desc">성취기준 문장을 그대로 옮기지 말고, 학생이 실제로 해야 하는 일로 풀어 쓰십시오.</p></div>
+      <div class="card-head-tools"><button class="btn btn-sm btn-soft no-print" id="btnAutoAnalyze">선택한 성취기준 불러오기</button></div>
+    </div>
+    <div class="grid g3">
+      <div class="field"><label>지식 · 이해 <span class="tag b">무엇을 아는가</span></label>
+        <textarea data-k="anKnow" placeholder="예) 밀도, 용해도, 끓는점의 의미&#10;예) 혼합물 분리에 이용되는 물질의 특성"></textarea></div>
+      <div class="field"><label>과정 · 기능 <span class="tag g">무엇을 할 수 있는가</span></label>
+        <textarea data-k="anSkill" placeholder="예) 물질의 특성 비교하기&#10;예) 분리 실험 설계하기&#10;예) 실험 결과를 글과 그림으로 표현하기"></textarea></div>
+      <div class="field"><label>가치 · 태도 <span class="tag p">어떤 태도를 기르는가</span></label>
+        <textarea data-k="anValue" placeholder="예) 증거에 근거해 주장하려는 태도&#10;예) 동료와 협력적으로 소통하려는 태도"></textarea></div>
+    </div>
+    <div class="note note-tip">
+      성취기준 문면에 드러나지 않는 <b>가치·태도</b>는 영역별 성취수준, 성취기준 해설, 성취기준 적용 시 고려 사항을 참고하여 도출할 수 있습니다.
+    </div>
+  </div>
+
+  <!-- 2-4 본질적 목표 -->
+  <div class="section-title">04. 본질적 목표와 핵심 질문</div>
+  <div class="card">
+    <div class="card-head">
+      <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg></div>
+      <div><h2>이 단원에서 학생이 끝내 갖게 될 것</h2><p class="desc">단원이 끝난 뒤에도 남아야 할 이해를 한 문장으로 적으십시오.</p></div>
+    </div>
+    <div class="field"><label>본질적 목표 <span class="req">*</span></label>
+      <textarea data-k="bigGoal" rows="2" placeholder="예) 물질마다 고유한 특성이 있고, 그 차이를 이용하면 섞여 있는 물질을 분리할 수 있다는 것을 실험 설계로 설명할 수 있다."></textarea></div>
+    <div class="grid g3">
+      <div class="field"><label>사실적 · 개념적 질문</label>
+        <textarea data-k="qFact" placeholder="예) 물질을 구별하는 특성에는 어떤 것이 있는가?"></textarea></div>
+      <div class="field"><label>사고를 여는 비계 질문 (토의·토론)</label>
+        <textarea data-k="qScaffold" placeholder="예) 혼합물을 분리할 때 여러 특성 중 어떤 것을 선택해야 할까?&#10;예) 제한 시간 안에 분리하려면 실험 순서를 어떻게 정해야 할까?"></textarea></div>
+      <div class="field"><label>전이 질문 (실생활 적용)</label>
+        <textarea data-k="qTransfer" placeholder="예) 바다에 유출된 기름을 회수할 때 어떤 특성을 이용해야 할까?"></textarea></div>
+    </div>
+    <div class="field mb0"><label>교과 역량 <span class="tag">2022 개정 과학과</span></label>
+      <div class="chips" data-chipset="competency" data-k="competency">
+        <button class="chip" type="button" data-v="과학적 탐구 능력">과학적 탐구 능력</button>
+        <button class="chip" type="button" data-v="과학적 문제해결 능력">과학적 문제해결 능력</button>
+        <button class="chip" type="button" data-v="과학적 의사결정 능력">과학적 의사결정 능력</button>
+        <button class="chip" type="button" data-v="과학적 사고력">과학적 사고력</button>
+        <button class="chip" type="button" data-v="과학적 의사소통 능력">과학적 의사소통 능력</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2-5 평가 요소 -->
+  <div class="section-title">05. 평가 요소 도출</div>
+  <div class="card">
+    <div class="card-head">
+      <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12l2 2 4-4"/></svg></div>
+      <div><h2>성취기준 도달의 증거를 ‘~하기’로 쓰기</h2><p class="desc">여기서 정한 항목이 채점기준표의 채점 요소가 됩니다. 3~5개가 적당합니다.</p></div>
+      <div class="card-head-tools"><button class="btn btn-sm btn-soft no-print" data-add="planElem">+ 평가 요소 추가</button></div>
+    </div>
+    <div data-rep="planElem"></div>
+    <div class="note note-info">
+      <b>진술 요령</b> · 학생이 주도적으로 반응할 수 있는 지시어를 <b>명사형 어구 ‘~하기’</b>로 씁니다. (예: “소화 효소의 작용과 관련지어 소화 과정 추론하기”, “두 자료의 공통점과 차이점 비교하여 설명하기”)
+    </div>
+  </div>
+
+  <!-- 2-6 평가 방법 -->
+  <div class="section-title">06. 평가 방법 선정</div>
+  <div class="card">
+    <div class="grid g2">
+      <div class="field"><label>평가 장면</label>
+        <div class="pillset" data-radioset="mScene" data-k="mScene">
+          <label class="pill"><input type="radio" name="mScene" value="지필평가(정기고사)"><span>지필평가(정기고사)</span></label>
+          <label class="pill"><input type="radio" name="mScene" value="수행평가"><span>수행평가</span></label>
+          <label class="pill"><input type="radio" name="mScene" value="수업 중 형성평가"><span>수업 중 형성평가</span></label>
+        </div>
+      </div>
+      <div class="field"><label>문항 유형</label>
+        <div class="pillset" data-radioset="mForm" data-k="mForm">
+          <label class="pill"><input type="radio" name="mForm" value="서술형"><span>서술형</span></label>
+          <label class="pill"><input type="radio" name="mForm" value="논술형(제한형)"><span>논술형 · 제한형</span></label>
+          <label class="pill"><input type="radio" name="mForm" value="논술형(확장형)"><span>논술형 · 확장형</span></label>
+          <label class="pill"><input type="radio" name="mForm" value="서술+논술 단계형"><span>서술 + 논술 단계형</span></label>
+        </div>
+      </div>
+      <div class="field"><label>채점 방식</label>
+        <div class="pillset" data-radioset="mRubric" data-k="mRubric">
+          <label class="pill"><input type="radio" name="mRubric" value="분석적 채점"><span>분석적 채점</span></label>
+          <label class="pill"><input type="radio" name="mRubric" value="총체적 채점"><span>총체적 채점</span></label>
+          <label class="pill"><input type="radio" name="mRubric" value="분석적+총체적 병행"><span>병행</span></label>
+        </div>
+      </div>
+      <div class="field"><label>평가 주체</label>
+        <div class="chips" data-chipset="mWho" data-k="mWho">
+          <button class="chip" type="button" data-v="교사평가">교사평가</button>
+          <button class="chip" type="button" data-v="동료평가">동료평가</button>
+          <button class="chip" type="button" data-v="자기평가">자기평가</button>
+        </div>
+      </div>
+    </div>
+    <div class="field mb0"><label>선정 이유 (왜 이 방법이 이 성취기준에 타당한가)</label>
+      <textarea data-k="mWhy" rows="2" placeholder="예) 실험 설계 능력은 선택형으로 확인할 수 없고, 학생이 스스로 순서와 근거를 구성해야 드러나므로 수행평가 논술형으로 시행한다."></textarea></div>
+  </div>
+
+  <!-- 2-7 차시 계획 -->
+  <div class="section-title">07. 수업–평가 연계 차시 계획</div>
+  <div class="card">
+    <div class="card-head">
+      <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+      <div><h2>배운 대로 평가하기</h2><p class="desc">평가에서 요구할 사고를 수업의 어느 차시에서 연습시켰는지 적으십시오.</p></div>
+      <div class="card-head-tools"><button class="btn btn-sm btn-soft no-print" data-add="planLesson">+ 차시 추가</button></div>
+    </div>
+    <div class="tablewrap">
+      <table class="compact" id="lessonTable">
+        <thead><tr>
+          <th style="width:56px" class="num">차시</th>
+          <th style="width:34%">교수·학습 활동</th>
+          <th style="width:22%">평가 계획</th>
+          <th>평가의 흐름과 의미 (수업과의 연계)</th>
+          <th style="width:44px" class="num no-print"></th>
+        </tr></thead>
+        <tbody data-rep="planLesson"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 2-8 피드백 계획 -->
+  <div class="section-title">08. 피드백 계획</div>
+  <div class="card">
+    <div class="grid g2">
+      <div class="field"><label>목표 참조 피드백 <span class="tag b">도달 목표 대비</span></label>
+        <textarea data-k="fbGoal" placeholder="예) 채점기준표의 ‘과학적 원리 연결’ 항목을 기준으로, 학생 답안에서 원리가 언급된 문장에 밑줄을 긋고 빠진 연결 고리를 한 문장으로 제시한다."></textarea></div>
+      <div class="field"><label>자기 참조 피드백 <span class="tag g">이전 수행 대비</span></label>
+        <textarea data-k="fbSelf" placeholder="예) 1차시 형성평가 답안과 비교해 향상된 지점을 먼저 밝히고, 다음에 시도할 한 가지를 제안한다."></textarea></div>
+      <div class="field"><label>피드백 시기와 방법</label>
+        <textarea data-k="fbHow" placeholder="예) 3차시 종료 직후 모둠별 채점기준표 적용 → 4차시 도입에 전체 오류 유형 O/X 퀴즈 → 개별 코멘트는 답안지에 기록"></textarea></div>
+      <div class="field"><label>재도전 · 보정 지도 계획</label>
+        <textarea data-k="fbRetry" placeholder="예) E 수준 학생에게는 조건 문장을 문단 틀로 제공하여 다시 작성할 기회를 준다."></textarea></div>
+    </div>
+  </div>
+
+  <!-- 2-9 계획 점검 -->
+  <div class="section-title">09. 평가 계획 단계 점검</div>
+  <div class="card">
+    <div class="card-head">
+      <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+      <div><h2>계획을 확정하기 전에</h2><p class="desc">모두 체크되었을 때 문항 개발 단계로 넘어가십시오.</p></div>
+      <div class="card-head-tools"><button class="btn btn-sm btn-danger no-print" data-reset-check="plan">체크 초기화</button></div>
+    </div>
+    <div class="progress-head">
+      <div class="ring" id="planRing"><svg viewBox="0 0 40 40"><circle class="bgc" cx="20" cy="20" r="16"/><circle class="fgc" cx="20" cy="20" r="16"/></svg><b>0%</b></div>
+      <div style="flex:1">
+        <div class="row between mb8"><span style="font-size:13px;font-weight:700">평가 계획 점검 진행률</span><span class="progress-num" id="planNum">0 / 0</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="planFill"></div></div>
+      </div>
+    </div>
+    <div id="planCheck"></div>
+  </div>
+
+  <!-- 2-10 미리보기 -->
+  <div class="section-title">10. 평가 계획서 미리보기</div>
+  <div class="card">
+    <div class="card-head">
+      <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 12S5 5 12 5s10.5 7 10.5 7S19 19 12 19 1.5 12 1.5 12z"/><circle cx="12" cy="12" r="3"/></svg></div>
+      <div><h2>완성된 문서 형태로 확인하기</h2><p class="desc">아래 문서를 그대로 PDF·이미지로 저장할 수 있습니다.</p></div>
+      <div class="card-head-tools no-print">
+        <button class="btn btn-sm" data-render="plan">새로고침</button>
+        <button class="btn btn-sm" data-png="planDoc" data-name="서논술형_평가계획서">PNG</button>
+        <button class="btn btn-sm" data-word="planDoc" data-name="서논술형_평가계획서" data-title="서·논술형 평가 계획서">Word</button>
+        <button class="btn btn-sm btn-primary" data-pdf="p2">PDF 저장</button>
+      </div>
+    </div>
+    <div id="planDoc" class="doc"></div>
+  </div>
+
+</section>
+
+<!-- ================================================================
+     3. 서·논술형 평가 문항 · 도구 제작
+     ================================================================ -->
+<section class="panel" id="p3" data-title="서·논술형 평가 문항 개발">
+
+  <div class="hero">
+    <div class="hero-badge">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.6 7.6"/><circle cx="11" cy="11" r="2"/></svg>
+      STEP 2 · 자료 → 발문 → 조건 순서로 만듭니다
+    </div>
+    <h1>서·논술형 평가 문항 · 도구 제작</h1>
+    <p>문항은 <b>발문 · 자료 · 조건</b>의 조합입니다. 순서를 지키십시오. ① 어떤 사고를 요구할지 한 문장으로 정하고 → ② 그 사고가 필요하도록 자료를 가공하고(결론 제거) → ③ 발문으로 요구를 명시하고 → ④ 조건으로 범위를 한정합니다. 조건을 쓴 뒤에는 반드시 4번 메뉴에서 채점 요소와 1:1로 맞춰 보십시오.</p>
+  </div>
+
+  <!-- 3-1 기본 정보 -->
+  <div class="section-title">01. 문항 개발 기본 정보</div>
+  <div class="card">
+    <div class="card-head">
+      <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 15h6M9 11h3"/></svg></div>
+      <div><h2>문항 정보표</h2><p class="desc">학교·교사·학년은 2번 메뉴의 기본 정보와 자동으로 연동됩니다.</p></div>
+      <div class="card-head-tools no-print"><button class="btn btn-sm btn-soft" id="btnSyncBasic">기본 정보 불러오기</button></div>
+    </div>
+    <div class="grid g4">
+      <div class="field"><label>학교 이름</label><input type="text" data-k="i_school" placeholder="예) 송쌤중학교"></div>
+      <div class="field"><label>선생님 이름</label><input type="text" data-k="i_teacher" placeholder="예) 송세호"></div>
+      <div class="field"><label>수업 학년</label><input type="text" data-k="i_grade" placeholder="예) 중학교 2학년"></div>
+      <div class="field"><label>과목 / 단원</label><input type="text" data-k="i_unit" placeholder="예) 과학 / Ⅲ. 물질의 특성"></div>
+      <div class="field"><label>문항 번호</label><input type="text" data-k="i_no" placeholder="예) 3번 (하위문항 2개)"></div>
+      <div class="field"><label>문항 유형</label>
+        <select data-k="i_type"><option value="">선택</option><option>서술형</option><option>논술형 · 제한형</option><option>논술형 · 확장형</option><option>서술형 + 논술형 단계형</option></select>
+      </div>
+      <div class="field"><label>배점</label><input type="text" data-k="i_point" placeholder="예) 6점"></div>
+      <div class="field"><label>예상 응답 시간</label><input type="text" data-k="i_time" placeholder="예) 12분"></div>
+      <div class="field"><label>목표 성취수준</label>
+        <select data-k="i_level"><option value="">선택</option><option>A 수준을 변별하는 문항</option><option>B 수준을 변별하는 문항</option><option>C 수준을 변별하는 문항</option><option>D~E(최소 성취수준) 확인 문항</option><option>전 수준을 고르게 점검</option></select>
+      </div>
+      <div class="field"><label>응답 분량</label>
+        <select data-k="i_len"><option value="">선택</option><option>한 문장</option><option>한 문장 초과(2~4문장)</option><option>한 문단</option><option>한 문단 초과</option><option>기타(표·그래프·그림 포함)</option></select>
+      </div>
+      <div class="field"><label>사고 수준 (DOK)</label>
+        <select data-k="i_dok"><option value="">선택</option><option>DOK 1 · 회상과 재생</option><option>DOK 2 · 기능과 개념의 적용</option><option>DOK 3 · 전략적 사고 / 근거 있는 추론</option><option>DOK 4 · 확장된 사고 / 전이와 창안</option></select>
+      </div>
+      <div class="field"><label>평가 장면</label>
+        <select data-k="i_scene"><option value="">선택</option><option>수행평가</option><option>지필평가(정기고사)</option><option>수업 중 형성평가</option></select>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3-2 성취기준 -->
+  <div class="section-title">02. 문항의 근거 성취기준</div>
+  <div class="card">
+    <div class="card-head">
+      <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+      <div><h2>어느 성취기준을 재는 문항인가</h2><p class="desc">문항 하나에 성취기준 1~2개가 적당합니다. 너무 많으면 채점 요소가 흐려집니다.</p></div>
+      <div class="card-head-tools"><span class="tag b" id="stdPickCount3">0개 선택</span></div>
+    </div>
+    <div class="std-toolbar">
+      <select data-std="school" data-scope="item"><option value="">전체 학교급</option></select>
+      <select data-std="subject" data-scope="item"><option value="">전체 과목</option></select>
+      <select data-std="area" data-scope="item"><option value="">전체 영역</option></select>
+      <input type="text" data-std="q" data-scope="item" placeholder="성취기준 코드 또는 내용 검색">
+    </div>
+    <div class="std-list" data-std="list" data-scope="item"></div>
+    <div class="picked" data-std="picked" data-scope="item"></div>
+  </div>
+
+  <!-- 3-3 요구할 사고 -->
+  <div class="section-title">03. 요구할 사고 한 문장</div>
+  <div class="card">
+    <div class="card-head">
+      <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 0-4 12.7V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.3A7 7 0 0 0 12 2z"/><path d="M9 22h6"/></svg></div>
+      <div><h2>이 문항이 학생에게 시키는 생각</h2><p class="desc">여기가 흔들리면 자료도 발문도 조건도 흔들립니다. 반드시 먼저 확정하십시오.</p></div>
+    </div>
+    <div class="field"><label>요구할 사고 <span class="req">*</span></label>
+      <textarea data-k="i_think" rows="2" placeholder="예) 두 실험 결과의 차이를 밀도 개념으로 해석하여, 제시되지 않은 세 번째 물질의 분리 순서를 스스로 결정하게 한다."></textarea>
+      <p class="hint">동사 하나로 끝내지 말고 “<b>무엇을 근거로 → 무엇을 판단·구성하게 하는가</b>”가 드러나게 쓰십시오.</p>
+    </div>
+    <div class="field"><label>출제 의도 (문항 정보표에 기재)</label>
+      <textarea data-k="i_intent" rows="3" placeholder="예) 본 문항은 B 수준을 고려하여 출제한 것으로, 수업 중 수행한 밀도 분리 실험 경험을 바탕으로 새로운 혼합물에 대해 분리 순서를 설계하고 그 근거를 과학 개념으로 설명할 수 있는지 확인하도록 설계하였다."></textarea></div>
+    <div class="field mb0"><label>수업과의 연계 (이 사고를 어느 차시에서 연습시켰는가)</label>
+      <textarea data-k="i_link" rows="2" placeholder="예) 1차시에 밀도 차 분리 실험을 직접 수행하고 실험보고서를 작성했으며, 2차시에 동료평가로 실험 설계를 수정하는 활동을 하였다."></textarea></div>
+  </div>
+
+  <!-- 3-4 자료 -->
+  <div class="section-title">04. 자료(제시문) 확보와 가공</div>
+  <div class="card">
+    <div class="card-head">
+      <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
+      <div><h2>자료는 ‘읽고 생각하게’ 만드는 장치입니다</h2><p class="desc">결론이 남아 있으면 학생은 옮겨 적기만 합니다.</p></div>
+    </div>
+    <div class="field"><label>자료 본문</label>
+      <textarea data-k="i_material" rows="7" placeholder="그래프·표·실험 결과·기사 발췌 등 학생에게 제시할 자료를 그대로 입력하십시오.&#10;표는 줄바꿈과 기호(| , →)로 간단히 나타내도 됩니다."></textarea></div>
+    <div class="grid g2">
+      <div class="field"><label>자료 형태</label>
+        <div class="chips" data-chipset="i_matType" data-k="i_matType">
+          <button class="chip" type="button" data-v="실험 결과 표">실험 결과 표</button>
+          <button class="chip" type="button" data-v="그래프">그래프</button>
+          <button class="chip" type="button" data-v="모식도·그림">모식도·그림</button>
+          <button class="chip" type="button" data-v="기사·글">기사·글</button>
+          <button class="chip" type="button" data-v="통계·데이터">통계·데이터</button>
+          <button class="chip" type="button" data-v="학생 활동 산출물">학생 활동 산출물</button>
+        </div>
+      </div>
+      <div class="field"><label>출처 (원문 확인 필수)</label>
+        <input type="text" data-k="i_matSrc" placeholder="예) 기상청 기후정보포털, 2025년 월별 평균기온 자료">
+        <p class="hint">AI가 제안한 출처는 부정확하거나 실재하지 않을 수 있습니다. 문항에 넣기 전 반드시 원문을 직접 확인하십시오.</p>
+      </div>
+    </div>
+    <div class="field mb0"><label>가공 내역 — 무엇을 잘라냈는가</label>
+      <textarea data-k="i_matEdit" rows="2" placeholder="예) 원 기사의 마지막 문단(‘따라서 해수면 상승의 원인은 …이다’)을 삭제하여 결론을 학생이 도출하도록 하였다. 용어 3개를 중학교 수준으로 바꾸었다."></textarea></div>
+    <div class="note note-warn">
+      <div class="note-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>자료 점검 두 가지</div>
+      ① 이 자료에 <b>결론이 남아 있지 않습니까?</b> &nbsp; ② 자료의 문장을 그대로 옮겨 적으면 <b>답이 되어 버리지 않습니까?</b>
+    </div>
+  </div>
+
+  <!-- 3-5 발문 -->
+  <div class="section-title">05. 발문 작성</div>
+  <div class="card">
+    <div class="card-head">
+      <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.1 9a3 3 0 1 1 4 2.8c-.8.3-1.1 1-1.1 1.7v.5"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="9.5"/></svg></div>
+      <div><h2>간접 발문 + 직접 발문</h2><p class="desc">상황을 열어 주는 문장과, 무엇을 쓰라고 요구하는 문장을 분리하십시오.</p></div>
+    </div>
+    <div class="field"><label>간접 발문 (상황 안내)</label>
+      <input type="text" data-k="i_qIndirect" placeholder="예) 다음은 세 가지 고체 혼합물의 분리 실험 결과이다. 물음에 답하시오."></div>
+    <div class="field"><label>직접 발문 (요구) <span class="req">*</span></label>
+      <textarea data-k="i_qDirect" rows="3" placeholder="예) (가)와 (나)에서 물질이 분리된 이유를 <조건>에 맞추어 비교하여 설명하시오."></textarea></div>
+    <div class="field"><label>반응 지시어 선택 <span class="tag b">클릭하면 발문 끝에 삽입</span></label>
+      <div class="chips" id="verbChips"></div>
+      <p class="hint">교과 교육과정 내용 체계의 <b>과정·기능</b>을 참고해 지시어를 고르면 성취기준과 발문이 어긋나지 않습니다.</p>
+    </div>
+    <div class="field mb0"><label>하위 문항 구성</label>
+      <div class="pillset" data-radioset="i_sub" data-k="i_sub">
+        <label class="pill"><input type="radio" name="i_sub" value="단독 문항"><span>단독 문항</span></label>
+        <label class="pill"><input type="radio" name="i_sub" value="하위 문항 2개"><span>하위 문항 2개</span></label>
+        <label class="pill"><input type="radio" name="i_sub" value="하위 문항 3개 이상"><span>하위 문항 3개 이상</span></label>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3-6 조건 -->
+  <div class="section-title">06. 조건 작성</div>
+  <div class="card">
+    <div class="card-head">
+      <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/><path d="M18 16l2 2 3-3"/></svg></div>
+      <div><h2>학생에게는 안내, 채점자에게는 인정 범위</h2><p class="desc">조건 하나하나가 채점 요소 하나와 짝을 이루어야 합니다.</p></div>
+      <div class="card-head-tools"><button class="btn btn-sm btn-soft no-print" data-add="itemCond">+ 조건 추가</button></div>
+    </div>
+    <div data-rep="itemCond"></div>
+    <div class="note note-warn">
+      <b>조건에 정답이 새지 않게</b> · “물의 밀도가 1 g/cm³보다 작다는 점을 쓸 것”처럼 답 자체를 조건에 넣으면 사고를 요구하지 못합니다. 사용할 <b>개념어의 이름</b>까지만 제시하십시오. (예: “‘밀도’와 ‘용해도’를 모두 사용할 것”)
+    </div>
+    <div class="grid g2 mt12">
+      <div class="field mb0"><label>예시(모범) 답안 <span class="req">*</span></label>
+        <textarea data-k="i_answer" rows="5" placeholder="예시 답안을 직접 써 보면 응답 소요 시간과 인정 범위를 가늠할 수 있습니다."></textarea></div>
+      <div class="field mb0"><label>인정 답안 · 예외 답안의 범위</label>
+        <textarea data-k="i_accept" rows="5" placeholder="예) ‘무겁다’로 쓴 경우 밀도 개념을 함께 설명했다면 인정한다.&#10;예) 실험 순서가 달라도 각 단계의 근거가 타당하면 인정한다.&#10;예) 개념어를 쓰지 않고 현상만 서술한 경우는 부분 점수."></textarea></div>
+    </div>
+  </div>
+
+  <!-- 3-7 미리보기 -->
+  <div class="section-title">07. 문항 미리보기</div>
+  <div class="card">
+    <div class="card-head">
+      <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 12S5 5 12 5s10.5 7 10.5 7S19 19 12 19 1.5 12 1.5 12z"/><circle cx="12" cy="12" r="3"/></svg></div>
+      <div><h2>학생이 받을 시험지 모습</h2><p class="desc">학생의 눈으로 한 번, 채점자의 눈으로 한 번 읽어 보십시오.</p></div>
+      <div class="card-head-tools no-print">
+        <button class="btn btn-sm" data-render="item">새로고침</button>
+        <button class="btn btn-sm" data-png="itemDoc" data-name="서논술형_평가문항">PNG</button>
+        <button class="btn btn-sm" data-word="itemDoc" data-name="서논술형_평가문항" data-title="서·논술형 평가 문항">Word</button>
+        <button class="btn btn-sm btn-primary" data-pdf="p3">PDF 저장</button>
+      </div>
+    </div>
+    <div id="itemDoc" class="doc"></div>
+  </div>
+
+  <!-- 3-8 체크리스트 -->
+  <div class="section-title">08. 서술형·논술형 문항 제작 체크리스트</div>
+  <div class="card">
+    <div class="card-head">
+      <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+      <div>
+        <h2>문항을 확정하기 전 세부 점검</h2>
+        <p class="desc">교육청 자료의 점검표를 요소별로 나누어 재구성했습니다. 체크 상태는 자동 저장됩니다.</p>
+      </div>
+      <div class="card-head-tools no-print">
+        <button class="btn btn-sm" id="itemExpand">모두 펼치기</button>
+        <button class="btn btn-sm btn-danger" data-reset-check="item">체크 초기화</button>
+      </div>
+    </div>
+    <div class="progress-head">
+      <div class="ring" id="itemRing"><svg viewBox="0 0 40 40"><circle class="bgc" cx="20" cy="20" r="16"/><circle class="fgc" cx="20" cy="20" r="16"/></svg><b>0%</b></div>
+      <div style="flex:1">
+        <div class="row between mb8"><span style="font-size:13px;font-weight:700">문항 점검 진행률</span><span class="progress-num" id="itemNum">0 / 0</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="itemFill"></div></div>
+      </div>
+    </div>
+    <div id="itemCheck"></div>
+
+    <div class="section-title" style="margin-top:26px">요소별 핵심 점검표 <span class="tag o" style="text-transform:none;letter-spacing:0">한 장으로 보는 최종 확인</span></div>
+    <div class="tablewrap">
+      <table class="compact" id="quickCheckTable">
+        <thead><tr><th style="width:120px">항목</th><th>무엇을 보는가</th><th style="width:64px" class="num">체크</th></tr></thead>
+        <tbody id="quickCheckBody"></tbody>
+      </table>
+    </div>
+
+    <div class="section-title" style="margin-top:26px">문항·채점기준 적절성 자기 평가 <span class="tag b" style="text-transform:none;letter-spacing:0">4점 척도</span></div>
+    <div class="tablewrap">
+      <table class="compact" id="rateTable">
+        <thead><tr>
+          <th style="width:40px" class="num">연번</th><th>내용</th>
+          <th style="width:74px" class="num">전혀<br>그렇지 않다</th>
+          <th style="width:70px" class="num">그렇지<br>않다</th>
+          <th style="width:56px" class="num">그렇다</th>
+          <th style="width:60px" class="num">매우<br>그렇다</th>
+        </tr></thead>
+        <tbody id="rateBody"></tbody>
+      </table>
+    </div>
+    <div class="note note-tip mt12" id="rateSummary"></div>
+
+    <div class="field mt16 mb0"><label>발견한 결함과 수정안 <span class="tag o">한 문장으로</span></label>
+      <textarea data-k="i_fix" rows="3" placeholder="예) 조건 ②가 채점 요소에 대응하지 않는다 → 채점 요소 ‘근거의 과학적 타당성’을 신설하고 배점 2점을 배분한다."></textarea></div>
+    <p class="src">출처 정리 : 서울특별시교육청 「수업과 연계한 과학과 서·논술형 평가 실천하기」(2022)의 ‘서·논술형 평가 단계별 점검 – 과제 개발 / 채점기준표 개발’, 경기도교육청 「2025 중등 논술형 평가 길라잡이」의 ‘논술형 평가 문항 체크리스트’(KICE, 2024 논술형 평가도구 분석틀 참고분) 및 「서·논술형 평가 도구 개발의 방법과 사례 – 과학」의 문항 구조·채점 기준 개발 절차를 통합하여 재구성함.</p>
+  </div>
+
+</section>
+
+<!-- ================================================================
+     4. 채점기준표 제작
+     ================================================================ -->
+<section class="panel" id="p4" data-title="서·논술형 평가 채점기준표">
+
+  <div class="hero">
+    <div class="hero-badge">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><path d="M3 6h18M3 12h18M3 18h18"/><path d="M8 3v18M16 3v18"/></svg>
+      STEP 3 · 조건 하나에 채점 요소 하나
+    </div>
+    <h1>서·논술형 평가 채점기준표 제작</h1>
+    <p>채점기준표에는 <b>평가(채점) 요소 · 요소별 척도 · 수행 수준 진술문</b>이 반드시 들어가야 합니다. 진술은 “몇 개를 썼는가”가 아니라 <b>“어떤 질의 응답인가”</b>로 쓰십시오. 개수 세기 기준은 채점은 쉽지만 학생의 사고를 변별하지 못합니다.</p>
+  </div>
+
+  <!-- 4-1 설정 -->
+  <div class="section-title">01. 채점기준표 설계</div>
+  <div class="card">
+    <div class="card-head">
+      <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></div>
+      <div><h2>채점 방식과 척도 정하기</h2><p class="desc">과제의 특성·교수학습에서의 활용도·채점의 객관성을 함께 고려하십시오.</p></div>
+    </div>
+    <div class="grid g2">
+      <div class="field"><label>채점 방식</label>
+        <div class="pillset" data-radioset="r_kind" data-k="r_kind">
+          <label class="pill"><input type="radio" name="r_kind" value="analytic"><span>분석적 채점</span></label>
+          <label class="pill"><input type="radio" name="r_kind" value="holistic"><span>총체적 채점</span></label>
+        </div>
+        <p class="hint">분석적 = 요소별로 점수를 매겨 합산 · 피드백이 구체적 / 총체적 = 답안 전체 인상으로 판단 · 채점이 신속</p>
+      </div>
+      <div class="field"><label>적용 범위</label>
+        <div class="pillset" data-radioset="r_scope" data-k="r_scope">
+          <label class="pill"><input type="radio" name="r_scope" value="과업 특수적"><span>과업 특수적</span></label>
+          <label class="pill"><input type="radio" name="r_scope" value="일반적"><span>일반적</span></label>
+        </div>
+        <p class="hint">과업 특수적 = 이 문항 전용 · 채점자 일치도 높음 / 일반적 = 유사 과제에 반복 사용 · 학생과 미리 공유 가능</p>
+      </div>
+      <div class="field"><label>척도 단계 수</label>
+        <select data-k="r_levels" id="r_levels">
+          <option value="3">3단계</option><option value="4">4단계</option>
+          <option value="5" selected>5단계</option><option value="6">6단계</option>
+        </select>
+      </div>
+      <div class="field"><label>척도 표기</label>
+        <select data-k="r_label" id="r_label">
+          <option value="ABC">성취수준 (A · B · C · D · E)</option>
+          <option value="점수" selected>점수 (배점)</option>
+          <option value="상중하">상 · 중 · 하</option>
+          <option value="서술">탁월함 · 보통임 · 노력 필요</option>
+        </select>
+      </div>
+    </div>
+    <div class="grid g2">
+      <div class="field mb0"><label>문항 총 배점</label><input type="text" data-k="r_total" placeholder="예) 6점"></div>
+      <div class="field mb0"><label>기본 점수 부여 여부</label>
+        <input type="text" data-k="r_base" placeholder="예) 기본 점수 없음 / 답안 작성 시 1점">
+        <p class="hint">최소 능력의 수행 특성을 보이지 않은 학생이 기본 점수만으로 성취율 40%에 도달하지 않도록 유의합니다.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4-2 채점 요소 -->
+  <div class="section-title">02. 채점 요소와 수행 수준</div>
+  <div class="card">
+    <div class="card-head">
+      <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg></div>
+      <div><h2 id="rubricModeTitle">분석적 채점기준표</h2><p class="desc">2번 메뉴의 평가 요소와 3번 메뉴의 조건을 불러와 채점 요소로 삼을 수 있습니다.</p></div>
+      <div class="card-head-tools no-print">
+        <button class="btn btn-sm btn-soft" id="btnPullElems">평가 요소·조건 불러오기</button>
+        <button class="btn btn-sm btn-soft" data-add="rubricElem">+ 채점 요소 추가</button>
+      </div>
+    </div>
+    <div data-rep="rubricElem"></div>
+    <div class="row between mt12" id="rubricSumRow">
+      <span class="tiny muted">각 요소의 최고 배점을 합한 값입니다.</span>
+      <span class="progress-num">배점 합계 <b id="rubricSum" style="color:var(--brand);font-size:15px">0</b> 점</span>
+    </div>
+    <div class="note note-info mt12">
+      <b>수행 수준 진술 요령</b> · ① 수준 간 <b>질적 차이</b>가 드러나게 씁니다. ② 배타성(수준이 겹치지 않을 것)과 포괄성(평가하려는 능력을 빠짐없이 포함할 것)을 갖춥니다. ③ 문항의 <b>조건에 포함된 제약 요소</b>를 반드시 진술에 반영합니다. ④ 학생의 가치를 판단하는 표현은 쓰지 않습니다.
+    </div>
+  </div>
+
+  <!-- 4-3 총체적 -->
+  <div class="section-title">03. 총체적 채점기준 (선택)</div>
+  <div class="card">
+    <div class="card-head">
+      <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9"/><path d="M3 15h18v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div>
+      <div><h2>답안 전체를 한 수준으로 판단할 때</h2><p class="desc">분석적 채점과 병행하면 채점자 간 편차를 점검하는 기준으로 쓸 수 있습니다.</p></div>
+    </div>
+    <div id="holisticRows"></div>
+  </div>
+
+  <!-- 4-4 성취수준별 예측 -->
+  <div class="section-title">04. 성취수준별 학생 수행 특성과 피드백</div>
+  <div class="card">
+    <div class="card-head">
+      <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+      <div><h2>채점 전에 미리 써 보는 피드백 문장</h2><p class="desc">수준마다 학생에게 돌려줄 말을 준비하면 채점이 빨라지고 일관됩니다.</p></div>
+    </div>
+    <div class="tablewrap">
+      <table class="compact">
+        <thead><tr><th style="width:70px" class="num">수준</th><th style="width:110px">예상 점수 구간</th><th>예상 수행 특성 · 피드백 문장</th></tr></thead>
+        <tbody id="levelFeedback"></tbody>
+      </table>
+    </div>
+    <div class="note note-tip mt12">
+      문항 하나로 성취기준 단위의 성취수준을 확정하기는 어렵습니다. 여기서 정한 점수 구간은 <b>채점 중 판단을 돕는 참고선</b>으로 사용하십시오.
+    </div>
+  </div>
+
+  <!-- 4-5 채점 운영 -->
+  <div class="section-title">05. 채점 운영 계획</div>
+  <div class="card">
+    <div class="grid g2">
+      <div class="field"><label>채점자 간 신뢰도 확보 방법</label>
+        <textarea data-k="r_inter" rows="3" placeholder="예) 학생 답안 15부를 표본으로 뽑아 과학과 교사 3인이 가채점한 뒤, 점수 차가 2점 이상인 답안을 함께 검토하여 진술문을 수정한다."></textarea></div>
+      <div class="field"><label>채점자 내 신뢰도 확보 방법</label>
+        <textarea data-k="r_intra" rows="3" placeholder="예) 한 학급 분량(30부)마다 휴식하고, 첫 5부를 채점 종료 후 다시 채점하여 일관성을 확인한다. 학생 이름을 가리고 채점한다."></textarea></div>
+    </div>
+    <div class="field mb0"><label>공지 계획 <span class="tag b">학생·학부모</span></label>
+      <input type="text" data-k="r_notice" placeholder="예) 평가 2주 전 학급 게시판과 가정통신문으로 평가 요소와 채점기준표를 공지">
+    </div>
+  </div>
+
+  <!-- 4-6 검토 체크리스트 -->
+  <div class="section-title">06. 채점기준표 검토 체크리스트</div>
+  <div class="card">
+    <div class="card-head">
+      <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+      <div><h2>타당성 · 배점 · 배타성 · 명확성 · 실용성</h2><p class="desc">교과협의회에서 함께 확인하십시오.</p></div>
+      <div class="card-head-tools no-print">
+        <button class="btn btn-sm" id="rubExpand">모두 펼치기</button>
+        <button class="btn btn-sm btn-danger" data-reset-check="rubric">체크 초기화</button>
+      </div>
+    </div>
+    <div class="progress-head">
+      <div class="ring" id="rubRing"><svg viewBox="0 0 40 40"><circle class="bgc" cx="20" cy="20" r="16"/><circle class="fgc" cx="20" cy="20" r="16"/></svg><b>0%</b></div>
+      <div style="flex:1">
+        <div class="row between mb8"><span style="font-size:13px;font-weight:700">채점기준표 점검 진행률</span><span class="progress-num" id="rubNum">0 / 0</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="rubFill"></div></div>
+      </div>
+    </div>
+    <div id="rubCheck"></div>
+    <p class="src">출처 정리 : 경기도교육청 「2025 중등 논술형 평가 길라잡이」의 ‘채점기준표 검토하기’(타당성·배점·배타성/포괄성·명확성·실용성·문항 기술적 측면)와 「서·논술형 평가 도구 개발의 방법과 사례 – 과학」의 채점 유의점을 재구성함.</p>
+  </div>
+
+  <!-- 4-7 미리보기 -->
+  <div class="section-title">07. 채점기준표 미리보기</div>
+  <div class="card">
+    <div class="card-head">
+      <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 12S5 5 12 5s10.5 7 10.5 7S19 19 12 19 1.5 12 1.5 12z"/><circle cx="12" cy="12" r="3"/></svg></div>
+      <div><h2>배부·게시용 문서</h2><p class="desc">채점기준표는 문항 확정 후 학생·학부모에게 공지합니다.</p></div>
+      <div class="card-head-tools no-print">
+        <button class="btn btn-sm" data-render="rubric">새로고침</button>
+        <button class="btn btn-sm" data-png="rubricDoc" data-name="서논술형_채점기준표">PNG</button>
+        <button class="btn btn-sm" data-word="rubricDoc" data-name="서논술형_채점기준표" data-title="서·논술형 평가 채점기준표">Word</button>
+        <button class="btn btn-sm btn-primary" data-pdf="p4">PDF 저장</button>
+      </div>
+    </div>
+    <div id="rubricDoc" class="doc"></div>
+  </div>
+
+</section>
+
+<!-- ================================================================
+     5. 서·논술형 평가 에이전트 만들기
+     ================================================================ -->
+<section class="panel" id="p5" data-title="서·논술형 평가 에이전트 만들기">
+
+  <div class="hero">
+    <div class="hero-badge">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><rect x="4" y="8" width="16" height="12" rx="3"/><path d="M12 8V4M9 2h6"/><circle cx="9" cy="14" r="1.2"/><circle cx="15" cy="14" r="1.2"/></svg>
+      STEP 4 · 문항을 대신 만들지 않고, 절차를 안내하는 조수
+    </div>
+    <h1>서·논술형 평가 에이전트 만들기</h1>
+    <p>좋은 문항은 교사가 <b>결정</b>해야 나옵니다. 그래서 이 에이전트는 완성품을 내놓지 않고, 교사가 한 단계씩 결정하도록 <b>한 번에 하나씩 묻는</b> 방식으로 설계합니다. 아래에서 조건을 고르면 그대로 붙여 넣을 수 있는 지시문이 만들어집니다.</p>
+  </div>
+
+  <!-- 5-1 설계 원칙 -->
+  <div class="section-title">01. 왜 ‘절차 안내형’으로 만들어야 하는가</div>
+  <div class="card">
+    <div class="grid g3">
+      <div class="dok l3">
+        <div class="dok-lv">Principle 01</div><h5>결정권은 교사에게</h5>
+        <p>어느 성취기준으로 할지, 어떤 사고를 요구할지, 배점과 척도를 몇 단계로 할지는 <b>수업을 한 사람</b>만 알 수 있습니다. AI가 추측해 정하면 수업–평가 연계가 끊어집니다.</p>
+      </div>
+      <div class="dok l2">
+        <div class="dok-lv">Principle 02</div><h5>한 번에 한 단계씩</h5>
+        <p>여러 단계를 한 답변에 몰아서 끝내면 교사는 검토할 수 없습니다. 앞 단계가 확정되기 전에는 다음 단계를 제안하지 않도록 못 박습니다.</p>
+      </div>
+      <div class="dok l4">
+        <div class="dok-lv">Principle 03</div><h5>출처는 반드시 원문 확인</h5>
+        <p>생성형 AI는 실재하지 않는 기사·논문·통계를 그럴듯하게 제시합니다. 자료를 제안할 때마다 <b>확인 경고와 찾아가는 경로</b>를 함께 내도록 규칙에 넣습니다.</p>
+      </div>
+    </div>
+    <div class="note note-warn mt16">
+      <div class="note-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>사용 전 반드시 확인</div>
+      ① 학생 이름·학번 등 <b>개인정보를 입력하지 마십시오.</b> ② 저작권이 있는 지문·그림을 그대로 올리지 말고 출처를 밝혀 인용 범위 안에서 사용하십시오. ③ AI가 만든 문항·채점기준은 <b>초안</b>입니다. 교과협의회 검토를 거쳐 확정하십시오. ④ 소속 교육청의 생성형 AI 활용 지침과 학업성적관리시행지침을 우선 따르십시오.
+    </div>
+  </div>
+
+  <!-- 5-2 프롬프트 빌더 -->
+  <div class="section-title">02. 에이전트 지시문 만들기</div>
+  <div class="card">
+    <div class="card-head">
+      <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17l6-6-6-6M12 19h8"/></svg></div>
+      <div><h2>조건을 고르면 지시문이 완성됩니다</h2><p class="desc">교육청 서·논술형 평가 자료의 절차와 점검 항목을 근거로 구성했습니다.</p></div>
+    </div>
+    <div class="grid g2">
+      <div class="field"><label>대상 학교급</label>
+        <select data-k="a_school" data-agent="1">
+          <option>초등학교</option><option selected>중학교</option><option>고등학교</option>
+        </select>
+      </div>
+      <div class="field"><label>대상 과목</label>
+        <input type="text" data-k="a_subject" data-agent="1" value="과학" placeholder="예) 과학 / 통합과학 / 물리학">
+      </div>
+    </div>
+    <div class="field"><label>에이전트 이름</label>
+      <input type="text" data-k="a_name" data-agent="1" placeholder="예) 송쌤 서·논술형 문항 개발 조수">
+    </div>
+
+    <div class="field"><label>진행 절차 <span class="tag b">순서대로 한 단계씩</span></label>
+      <div class="chips" data-chipset="a_steps" data-k="a_steps" data-agent="1">
+        <button class="chip on" type="button" data-v="성취기준·성취수준 확인">① 성취기준·성취수준 확인</button>
+        <button class="chip on" type="button" data-v="평가 요소 도출">② 평가 요소 도출</button>
+        <button class="chip on" type="button" data-v="요구할 사고 한 문장 확정">③ 요구할 사고 한 문장</button>
+        <button class="chip on" type="button" data-v="자료 확보와 가공">④ 자료 확보·가공</button>
+        <button class="chip on" type="button" data-v="발문 작성">⑤ 발문 작성</button>
+        <button class="chip on" type="button" data-v="조건 작성">⑥ 조건 작성</button>
+        <button class="chip on" type="button" data-v="채점기준표 개발">⑦ 채점기준표 개발</button>
+        <button class="chip" type="button" data-v="예시 답안과 인정 범위 확정">⑧ 예시 답안·인정 범위</button>
+        <button class="chip" type="button" data-v="성취수준별 피드백 문장 작성">⑨ 수준별 피드백 문장</button>
+      </div>
+      <p class="hint">클릭해서 켜고 끌 수 있습니다. 선택한 순서대로 지시문에 반영됩니다.</p>
+    </div>
+
+    <div class="field"><label>질문 규칙</label>
+      <div class="chips" data-chipset="a_rules" data-k="a_rules" data-agent="1">
+        <button class="chip on" type="button" data-v="one">한 번에 질문 하나만</button>
+        <button class="chip on" type="button" data-v="choice">초안은 2~3개 선택지로</button>
+        <button class="chip on" type="button" data-v="ask">교사 결정 사항은 반드시 질문</button>
+        <button class="chip on" type="button" data-v="reask">답이 모호하면 되묻기</button>
+        <button class="chip on" type="button" data-v="short">답변은 짧게</button>
+        <button class="chip" type="button" data-v="korean">모든 답변은 한국어로</button>
+      </div>
+    </div>
+
+    <div class="field"><label>교사에게 반드시 물어야 할 항목</label>
+      <div class="chips" data-chipset="a_asks" data-k="a_asks" data-agent="1">
+        <button class="chip on" type="button" data-v="어느 성취기준으로 할지">성취기준 선택</button>
+        <button class="chip on" type="button" data-v="어떤 사고를 요구할지">요구할 사고</button>
+        <button class="chip on" type="button" data-v="자료에서 어느 부분을 잘라낼지(결론 제거 범위)">결론 제거 범위</button>
+        <button class="chip on" type="button" data-v="목표 사고 수준(DOK)과 목표 성취수준">DOK·목표 성취수준</button>
+        <button class="chip on" type="button" data-v="배점과 척도 단계 수">배점·척도 단계</button>
+        <button class="chip on" type="button" data-v="분석적 채점과 총체적 채점 중 어느 쪽으로 할지">채점 방식</button>
+        <button class="chip on" type="button" data-v="응답 분량(문장·문단 수준)">응답 분량</button>
+        <button class="chip" type="button" data-v="수업에서 이 사고를 어떻게 연습시켰는지">수업 연계 방식</button>
+      </div>
+    </div>
+
+    <div class="field"><label>단계별 점검 질문 포함</label>
+      <div class="chips" data-chipset="a_checks" data-k="a_checks" data-agent="1">
+        <button class="chip on" type="button" data-v="mat">자료 · 결론이 남아 있는지</button>
+        <button class="chip on" type="button" data-v="q">발문 · 옮겨 적으면 답이 되는지</button>
+        <button class="chip on" type="button" data-v="cond">조건 · 학생/채점자 두 눈으로 읽었는지</button>
+        <button class="chip on" type="button" data-v="rub">채점기준 · 조건마다 대응 요소가 있는지</button>
+        <button class="chip on" type="button" data-v="level">척도 · 수준 간 질적 차이가 있는지</button>
+      </div>
+    </div>
+
+    <div class="field"><label>추가로 넣을 지시 (선택)</label>
+      <textarea data-k="a_extra" data-agent="1" rows="3" placeholder="예) 우리 학교는 3수준(A/B/C) 체계를 쓰므로 척도는 3단계를 기본으로 제안할 것.&#10;예) 실험 기반 문항을 우선 제안할 것."></textarea>
+    </div>
+    <div class="field mb0"><label>첫 질문</label>
+      <input type="text" data-k="a_first" data-agent="1" placeholder="예) 어느 학년, 어느 단원으로 만드시겠습니까?">
+    </div>
+  </div>
+
+  <!-- 5-3 결과 -->
+  <div class="section-title">03. 완성된 지시문</div>
+  <div class="card">
+    <div class="card-head">
+      <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></div>
+      <div><h2>아래 내용을 그대로 복사해 붙여 넣으십시오</h2><p class="desc">플랫폼마다 붙여 넣는 칸의 이름이 다릅니다. 4번 항목의 안내를 참고하십시오.</p></div>
+      <div class="card-head-tools no-print">
+        <button class="btn btn-sm btn-primary" id="btnCopyPrompt">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          복사
+        </button>
+        <button class="btn btn-sm" id="btnDownloadPrompt">.txt 저장</button>
+        <button class="btn btn-sm" data-png="promptOut" data-name="서논술형_에이전트_지시문">PNG</button>
+        <button class="btn btn-sm" data-word="promptOut" data-name="서논술형_에이전트_지시문" data-title="서·논술형 평가 에이전트 지시문">Word</button>
+      </div>
+    </div>
+    <div class="prompt-out" id="promptOut"></div>
+    <div class="note note-info mt12">
+      <b>지식 파일로 함께 올리면 좋은 자료</b> · ① 우리 학교 학업성적관리시행지침 ② 해당 학년 교육과정 성취기준·성취수준 ③ 지난 학기 문항과 채점기준표 ④ 수업에서 실제로 사용한 학습지·실험보고서 양식. 이 자료가 있으면 에이전트가 <b>우리 교실 맥락</b>에 맞춰 질문합니다.
+    </div>
+  </div>
+
+  <!-- 5-4 플랫폼별 -->
+  <div class="section-title">04. 사이트별 에이전트 · 챗봇 만드는 방법</div>
+  <div class="card">
+    <div class="card-head">
+      <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 21h8M12 18v3"/></svg></div>
+      <div><h2>5개 플랫폼 제작 절차</h2><p class="desc">화면 명칭은 서비스 업데이트에 따라 달라질 수 있으니 흐름을 기준으로 따라가십시오.</p></div>
+      <div class="card-head-tools no-print">
+        <button class="btn btn-sm" data-word="p5" data-name="에이전트_만들기_전체" data-title="사이트별 에이전트 만드는 방법">전체 Word</button>
+        <button class="btn btn-sm btn-primary" data-pdf="p5">전체 PDF 저장</button>
+      </div>
+    </div>
+    <div class="plat-tabs no-print" id="platTabs"></div>
+    <div id="platPanels"></div>
+  </div>
+
+  <!-- 5-5 운영 팁 -->
+  <div class="section-title">05. 만든 뒤에 할 일</div>
+  <div class="card">
+    <div class="steps">
+      <div class="step">
+        <h5>같은 단원으로 3번 돌려 보기</h5>
+        <p>같은 성취기준으로 세 번 대화해 보면 에이전트가 어느 단계에서 앞서 나가는지, 어떤 질문을 빠뜨리는지 드러납니다. 그 지점을 지시문에 한 문장씩 추가하십시오.</p>
+      </div>
+      <div class="step">
+        <h5>일부러 순서를 건너뛰어 보기</h5>
+        <p>“자료부터 찾아 줘”라고 말해 보십시오. 에이전트가 이전 단계로 되돌리지 못하면 “앞 단계가 확정되기 전에는 다음 단계를 제안하지 마라”는 지시가 약한 것입니다.</p>
+      </div>
+      <div class="step">
+        <h5>가짜 출처를 시험하기</h5>
+        <p>“그 논문 링크 알려 줘”라고 요구해 보십시오. 확인 경고 없이 링크를 지어내면 자료 출처 규칙을 더 강하게 써야 합니다.</p>
+      </div>
+      <div class="step">
+        <h5>교과협의회와 공유하기</h5>
+        <p>완성된 지시문과 지식 파일을 동교과 교사와 공유하면 채점기준 해석이 통일되어 채점자 간 신뢰도 확보에도 도움이 됩니다.</p>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="wrap no-print" style="padding-top:0;padding-bottom:40px">
+  <div class="card flat" style="text-align:center;background:transparent;border-style:dashed">
+    <p class="tiny muted mb8" style="line-height:1.8">
+      <b>송쌤과학 서논술형 평가 계획 및 문항 개발 제작 사이트</b><br>
+      본 도구의 개념·절차·점검 항목은 서울특별시교육청 「수업과 연계한 과학과 서·논술형 평가 실천하기」(2022),
+      경기도교육청 「2025 중등 논술형 평가 길라잡이」·「2025 중등 교과별 논술형 평가 문항(과학)」·「서·논술형 평가 도구 개발의 방법과 사례 – 과학」의 내용을 참고하여 재구성하였습니다.<br>
+      성취기준 데이터 : 교육부 고시 제2022-33호 [별책 9] 과학과 교육과정 · 총 <b>473개</b>
+    </p>
+    <div class="row" style="justify-content:center">
+      <button class="btn btn-sm" id="btnExportJson">작업 내용 내보내기(.json)</button>
+      <button class="btn btn-sm" id="btnImportJson">불러오기</button>
+      <input type="file" id="fileImport" accept="application/json" class="sr">
+      <button class="btn btn-sm btn-danger" id="btnResetAll">전체 초기화</button>
+    </div>
+  </div>
+</footer>
+
+<!-- 플로팅 액션 -->
+<div class="fab-wrap no-print" id="fabWrap">
+  <div class="fab-menu">
+    <button class="btn" id="fabPdfAll">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+      전체 PDF 저장
+    </button>
+    <button class="btn" id="fabPdfOne">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
+      현재 메뉴 PDF
+    </button>
+    <button class="btn" id="fabPng">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+      현재 메뉴 이미지
+    </button>
+    <button class="btn" id="fabTop">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+      맨 위로
+    </button>
+  </div>
+  <button class="fab" id="fabMain" aria-label="빠른 작업 열기">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+  </button>
+</div>
+
+<div id="printHost" aria-hidden="true"></div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="assets/standards.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
