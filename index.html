@@ -348,6 +348,9 @@ html[data-theme="dark"] #themeToggle .sun { opacity: 0; transform: rotate(70deg)
 }
 .lbl .req { color: var(--danger); margin-left: 3px; }
 .hint { font-size: 11.8px; color: var(--text-3); margin-top: 5px; line-height: 1.5; }
+.field-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
+.field-head > label, .field-head > .lbl { margin-bottom: 0; }
+.field-head > .btn { flex: none; }
 
 input[type="text"], input[type="number"], input[type="date"], select, textarea {
   width: 100%; font-family: inherit; font-size: 14px; color: var(--text);
@@ -772,8 +775,11 @@ html[data-theme="dark"] .prompt-out { background: #0e1424; }
 #toast svg { width: 16px; height: 16px; flex: none; }
 
 /* ---------- 20. 플로팅 액션 ---------- */
-.fab-wrap { position: fixed; right: 22px; bottom: 22px; z-index: 70; display: flex; flex-direction: column; align-items: flex-end; gap: 9px; }
-.fab-menu { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+/* 닫혀 있을 때 fab-wrap / fab-menu 의 빈 상자가 화면 오른쪽 아래를 덮어
+   그 자리에 있는 버튼의 클릭을 가로채지 않도록 pointer-events 를 꺼 둔다.
+   실제로 눌러야 하는 .fab 과 열린 상태의 메뉴 버튼에서만 다시 켠다. */
+.fab-wrap { position: fixed; right: 22px; bottom: 22px; z-index: 70; display: flex; flex-direction: column; align-items: flex-end; gap: 9px; pointer-events: none; }
+.fab-menu { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; pointer-events: none; }
 .fab-menu .btn {
   opacity: 0; transform: translateY(10px) scale(.9); pointer-events: none;
   transition: opacity .24s, transform .3s cubic-bezier(.2,.9,.3,1);
@@ -785,7 +791,7 @@ html[data-theme="dark"] .prompt-out { background: #0e1424; }
 .fab-wrap.open .fab-menu .btn:nth-child(3) { transition-delay: .10s; }
 .fab-wrap.open .fab-menu .btn:nth-child(4) { transition-delay: .14s; }
 .fab {
-  width: 52px; height: 52px; border-radius: 17px; border: 0; cursor: pointer;
+  width: 52px; height: 52px; border-radius: 17px; border: 0; cursor: pointer; pointer-events: auto;
   display: grid; place-items: center; color: #fff;
   background: linear-gradient(135deg, var(--brand), var(--brand-2));
   box-shadow: 0 6px 22px rgba(47,109,246,.42);
@@ -1649,7 +1655,7 @@ html[data-theme="dark"] .prompt-out { background: #0e1424; }
       </div>
     </div>
     <div class="dl">
-      <a class="dl-item" href="사고력_함양_탐구기반_서논술형평가_계획_문항개발.pdf" target="_blank" rel="noopener">
+      <a class="dl-item" href="assets/workbook.pdf" download="사고력_함양_탐구기반_서논술형평가_계획_문항개발.pdf" target="_blank" rel="noopener">
         <div class="dl-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div>
         <div>
           <h5>워크북 PDF</h5>
@@ -1657,7 +1663,7 @@ html[data-theme="dark"] .prompt-out { background: #0e1424; }
           <code>사고력_함양_탐구기반_서논술형평가_계획_문항개발.pdf</code>
         </div>
       </a>
-      <a class="dl-item w" href="사고력_함양_탐구기반_서논술형평가_계획_문항개발.docx" target="_blank" rel="noopener">
+      <a class="dl-item w" href="assets/workbook.docx" download="사고력_함양_탐구기반_서논술형평가_계획_문항개발.docx" target="_blank" rel="noopener">
         <div class="dl-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13l1.6 5 2.4-7 2.4 7L16 13"/></svg></div>
         <div>
           <h5>워크북 Word</h5>
@@ -1794,7 +1800,7 @@ html[data-theme="dark"] .prompt-out { background: #0e1424; }
     <div class="card-head">
       <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12l2 2 4-4"/></svg></div>
       <div><h2>성취기준 도달의 증거를 ‘~하기’로 쓰기</h2><p class="desc">여기서 정한 항목이 채점기준표의 채점 요소가 됩니다. 3~5개가 적당합니다.</p></div>
-      <div class="card-head-tools"><button class="btn btn-sm btn-soft no-print" data-add="planElem">+ 평가 요소 추가</button></div>
+      <div class="card-head-tools"><button type="button" class="btn btn-sm btn-soft no-print" data-add="planElem">+ 평가 요소 추가</button></div>
     </div>
     <div data-rep="planElem"></div>
     <div class="note note-info">
@@ -1846,7 +1852,7 @@ html[data-theme="dark"] .prompt-out { background: #0e1424; }
     <div class="card-head">
       <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
       <div><h2>배운 대로 평가하기</h2><p class="desc">평가에서 요구할 사고를 수업의 어느 차시에서 연습시켰는지 적으십시오.</p></div>
-      <div class="card-head-tools"><button class="btn btn-sm btn-soft no-print" data-add="planLesson">+ 차시 추가</button></div>
+      <div class="card-head-tools"><button type="button" class="btn btn-sm btn-soft no-print" data-add="planLesson">+ 차시 추가</button></div>
     </div>
     <div class="tablewrap">
       <table class="compact" id="lessonTable">
@@ -2059,7 +2065,7 @@ html[data-theme="dark"] .prompt-out { background: #0e1424; }
     <div class="card-head">
       <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/><path d="M18 16l2 2 3-3"/></svg></div>
       <div><h2>학생에게는 안내, 채점자에게는 인정 범위</h2><p class="desc">조건 하나하나가 채점 요소 하나와 짝을 이루어야 합니다.</p></div>
-      <div class="card-head-tools"><button class="btn btn-sm btn-soft no-print" data-add="itemCond">+ 조건 추가</button></div>
+      <div class="card-head-tools"><button type="button" class="btn btn-sm btn-soft no-print" data-add="itemCond">+ 조건 추가</button></div>
     </div>
     <div data-rep="itemCond"></div>
     <div class="note note-warn">
@@ -2210,7 +2216,7 @@ html[data-theme="dark"] .prompt-out { background: #0e1424; }
       <div><h2 id="rubricModeTitle">분석적 채점기준표</h2><p class="desc">2번 메뉴의 평가 요소와 3번 메뉴의 조건을 불러와 채점 요소로 삼을 수 있습니다.</p></div>
       <div class="card-head-tools no-print">
         <button class="btn btn-sm btn-soft" id="btnPullElems">평가 요소·조건 불러오기</button>
-        <button class="btn btn-sm btn-soft" data-add="rubricElem">+ 채점 요소 추가</button>
+        <button type="button" class="btn btn-sm btn-soft" data-add="rubricElem">+ 채점 요소 추가</button>
       </div>
     </div>
     <div data-rep="rubricElem"></div>
@@ -2416,7 +2422,8 @@ html[data-theme="dark"] .prompt-out { background: #0e1424; }
       <textarea data-k="a_extra" data-agent="1" rows="3" placeholder="예) 우리 학교는 3수준(A/B/C) 체계를 쓰므로 척도는 3단계를 기본으로 제안할 것.&#10;예) 실험 기반 문항을 우선 제안할 것."></textarea>
     </div>
     <div class="field mb0"><label>첫 질문</label>
-      <input type="text" data-k="a_first" data-agent="1" placeholder="예) 어느 학년, 어느 단원으로 만드시겠습니까?">
+      <input type="text" data-k="a_first" data-agent="1" placeholder="예) 어떤 문항을 만들고 싶으신지 편하게 적어 주십시오. 한 줄 구상도 좋고, 고치고 싶은 기존 문항을 그대로 붙여 넣으셔도 됩니다.">
+      <p class="hint">이 조수는 교사가 만들고 싶은 문항을 먼저 받고, 부족한 정보를 되물어 가며 다듬는 방식으로 진행합니다.</p>
     </div>
   </div>
 
@@ -2590,10 +2597,10 @@ html[data-theme="dark"] .prompt-out { background: #0e1424; }
     </div>
 
     <div class="field" style="margin-top:16px">
-      <label>수행평가 과제 구성
-        <span class="tag g" id="g_perfTag">수행 0%</span>
-        <button class="btn btn-sm btn-soft no-print" data-add="planTask" style="float:right;margin-top:-4px">+ 과제 추가</button>
-      </label>
+      <div class="field-head">
+        <label class="lbl">수행평가 과제 구성 <span class="tag g" id="g_perfTag">수행 0%</span></label>
+        <button type="button" class="btn btn-sm btn-soft no-print" data-add="planTask">+ 과제 추가</button>
+      </div>
       <div data-rep="planTask"></div>
       <p class="hint">과제별 비율의 합이 수행평가 전체 비율이 됩니다. 실험·실습 과제를 반드시 하나 이상 넣으십시오.</p>
     </div>
@@ -2759,7 +2766,7 @@ html[data-theme="dark"] .prompt-out { background: #0e1424; }
 
 <div id="toast" role="status" aria-live="polite"></div>
 
-<script src="assets/standards.js"></script>
-<script src="assets/app.js"></script>
+<script src="assets/standards.js?v=20260905"></script>
+<script src="assets/app.js?v=20260905"></script>
 </body>
 </html>
