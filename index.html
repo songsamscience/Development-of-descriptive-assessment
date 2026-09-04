@@ -2502,7 +2502,7 @@ html[data-theme="dark"] .prompt-out { background: #0e1424; }
       STEP 5 · 한 학기 전체를 한 번에 설계하는 만능 지시문
     </div>
     <h1>교수학습·평가 계획 에이전트 만들기</h1>
-    <p>앞 메뉴가 <b>문항 하나</b>를 만드는 조수였다면, 이 에이전트는 <b>한 학기 계획서 전체</b>를 만듭니다. 학년·학기·단원과 평가 반영 비율만 정하면 운영 계획표, 학기 단위 성취수준, 반영 비율표, 수행평가 루브릭까지 한 번에 뽑아 주는 지시문이 완성됩니다. 아래에서 비율을 조정하면 기준 충족 여부가 즉시 표시됩니다.</p>
+    <p>앞 메뉴가 <b>문항 하나</b>를 만드는 조수였다면, 이 에이전트는 <b>한 학기 계획서 전체</b>를 만듭니다. 학년·학기·과목·단원과 평가 반영 비율만 정하면 운영 계획표, 학기 단위 성취수준, 반영 비율표, 수행평가 루브릭까지 한 번에 뽑아 주는 지시문이 완성됩니다. 아래에서 비율을 조정하면 기준 충족 여부가 즉시 표시됩니다.</p>
   </div>
 
   <!-- 7-1 기준 -->
@@ -2544,7 +2544,7 @@ html[data-theme="dark"] .prompt-out { background: #0e1424; }
       <div><h2>여기서 정한 값이 그대로 지시문에 들어갑니다</h2><p class="desc">비율을 바꾸면 아래 미리보기와 지시문이 즉시 다시 만들어집니다.</p></div>
     </div>
 
-    <div class="grid g3">
+    <div class="grid g4">
       <div class="field"><label>학년</label>
         <select data-k="g_grade" data-agent2="1">
           <option value="1">중학교 1학년</option>
@@ -2559,9 +2559,13 @@ html[data-theme="dark"] .prompt-out { background: #0e1424; }
           <label class="pill"><input type="radio" name="g_sem" value="2"><span>2학기</span></label>
         </div>
       </div>
-      <div class="field"><label>과목 · 단원명</label>
-        <input type="text" data-k="g_subject" data-agent2="1" placeholder="예) 과학 (물질의 상태 변화)">
-        <p class="hint">괄호 앞이 과목명, 괄호 안이 단원명으로 쓰입니다.</p>
+      <div class="field"><label>과목명</label>
+        <input type="text" data-k="g_course" data-agent2="1" value="과학" placeholder="예) 과학 / 통합과학 / 물리학">
+        <p class="hint">지시문의 이름과 역할 문장에 그대로 들어갑니다.</p>
+      </div>
+      <div class="field"><label>단원명</label>
+        <input type="text" data-k="g_unit" data-agent2="1" placeholder="예) 물질의 상태 변화">
+        <p class="hint">비워 두면 과목명만으로 계획서를 만듭니다.</p>
       </div>
     </div>
 
@@ -2599,7 +2603,7 @@ html[data-theme="dark"] .prompt-out { background: #0e1424; }
     <div class="field" style="margin-top:16px">
       <div class="field-head">
         <label class="lbl">수행평가 과제 구성 <span class="tag g" id="g_perfTag">수행 0%</span></label>
-        <button type="button" class="btn btn-sm btn-soft no-print" data-add="planTask">+ 과제 추가</button>
+        <button type="button" class="btn btn-sm btn-soft no-print" data-add="planTask">+ 수행평가 추가</button>
       </div>
       <div data-rep="planTask"></div>
       <p class="hint">과제별 비율의 합이 수행평가 전체 비율이 됩니다. 실험·실습 과제를 반드시 하나 이상 넣으십시오.</p>
@@ -2766,7 +2770,7 @@ html[data-theme="dark"] .prompt-out { background: #0e1424; }
 
 <div id="toast" role="status" aria-live="polite"></div>
 
-<script src="assets/standards.js?v=20260905"></script>
-<script src="assets/app.js?v=20260905"></script>
+<script src="assets/standards.js?v=20260905b"></script>
+<script src="assets/app.js?v=20260905b"></script>
 </body>
 </html>

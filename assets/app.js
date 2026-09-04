@@ -749,7 +749,7 @@ var REPS = {
       { k: 'name', ph: '예) 실험/실습 평가', type: 'text' },
       { k: 'pct', ph: '비율 %', type: 'number', center: true }
     ],
-    empty: '수행평가 과제가 없습니다. ‘+ 과제 추가’를 눌러 과제와 비율을 적으십시오.'
+    empty: '수행평가가 없습니다. ‘+ 수행평가 추가’를 눌러 과제와 비율을 적으십시오.'
   }
 };
 function repArr(name) {
@@ -1768,8 +1768,18 @@ function buildPlanPrompt() {
   var d = planNums();
   var grade = F('g_grade') || '2';
   var sem = F('g_sem') || '1';
-  var subject = F('g_subject') || '과학 (물질의 상태 변화)';
-  var subjectOnly = (subject.split('(')[0] || subject).trim() || subject;
+  /* 과목명·단원명은 따로 입력받는다.
+     예전 버전에서 “과학 (물질의 상태 변화)” 한 칸에 저장해 둔 값도 그대로 살려 쓴다. */
+  var course = F('g_course');
+  var unit = F('g_unit');
+  var legacy = F('g_subject');
+  if (isBlank(course) && !isBlank(legacy)) course = (legacy.split('(')[0] || '').trim();
+  if (isBlank(unit) && !isBlank(legacy) && legacy.indexOf('(') >= 0) {
+    unit = legacy.split('(').slice(1).join('(').replace(/\)\s*$/, '').trim();
+  }
+  if (isBlank(course)) course = '과학';
+  var subject = isBlank(unit) ? course : (course + ' (' + unit.trim() + ')');
+  var subjectOnly = course.trim();
   var rev = (grade === '3') ? '2015 개정' : '2022 개정';
   var head = '중학교 ' + grade + '학년 ' + sem + '학기 ' + subject;
   var extra = F('g_extra');
@@ -2512,15 +2522,14 @@ function init() {
   var lv = $('#r_levels'); if (lv) lv.value = state.f.r_levels;
   var lb = $('#r_label'); if (lb) lb.value = state.f.r_label;
 
-  if (!state.f.g_seeded) {
+  /* 수행평가 과제는 2개가 기본이다. 저장된 것이 없으면 언제나 두 줄을 만들어 둔다. */
+  if (!repArr('planTask').length) {
     state.f.g_seeded = '1';
-    if (!repArr('planTask').length) {
-      state.reps.planTask = [
-        { name: '실험·실습 평가', pct: '20' },
-        { name: '서·논술형 / 프로젝트', pct: '20' }
-      ];
-      renderRep('planTask');
-    }
+    state.reps.planTask = [
+      { name: '실험·실습 평가', pct: '20' },
+      { name: '서·논술형 / 프로젝트', pct: '20' }
+    ];
+    renderRep('planTask');
   }
   step('rubric', function () {
     if (!Array.isArray(state.rubric)) state.rubric = [];
