@@ -541,7 +541,7 @@ function goTab(id, skipScroll) {
   if (id === 'p2') renderPlanDoc();
   if (id === 'p3') renderItemDoc();
   if (id === 'p4') { renderRubric(); renderRubricDoc(); }
-  if (id === 'p5') buildPrompt();
+  if (id === 'p5') { buildPrompt(); buildQuickPrompt(); }
   if (id === 'p7') buildPlanPrompt();
 }
 function initTabs() {
@@ -564,6 +564,7 @@ function bindFields() {
     el.addEventListener(ev, function () {
       state.f[k] = el.value; autosave();
       if (el.hasAttribute('data-agent')) buildPrompt();
+      if (el.hasAttribute('data-agentq')) buildQuickPrompt();
       if (el.hasAttribute('data-agent2')) buildPlanPrompt();
       if (k === 'r_levels' || k === 'r_label') { relabelAll(); renderRubric(); renderHolistic(); renderLevelFeedback(); }
       liveDoc(el);
@@ -595,6 +596,7 @@ function bindChips() {
         c.classList.toggle('on', i < 0);
         autosave();
         if (box.hasAttribute('data-agent')) buildPrompt();
+        if (box.hasAttribute('data-agentq')) buildQuickPrompt();
         if (box.hasAttribute('data-agent2')) buildPlanPrompt();
         liveDoc(box);
       });
@@ -610,6 +612,7 @@ function bindRadios() {
       r.addEventListener('change', function () {
         state.f[k] = r.value; autosave();
         if (k === 'r_kind') { renderRubric(); renderRubricDoc(); }
+        if (box.hasAttribute('data-agentq')) buildQuickPrompt();
         if (box.hasAttribute('data-agent2')) buildPlanPrompt();
         liveDoc(box);
       });
@@ -1672,6 +1675,271 @@ function buildPrompt() {
   out.textContent = t.join('\n');
 }
 
+
+/* ======================================================================
+   PART 11-a2. 문항 에이전트 — 간단 버전(한 번에 답을 받는 추천 프롬프트)
+   ----------------------------------------------------------------------
+   정식 버전이 ‘한 번에 하나씩 묻는 지시문’을 만드는 것과 달리,
+   여기서는 되묻지 않고 첫 답변에서 문항 한 벌을 끝까지 내놓는
+   일회성 프롬프트를 만든다. 교사가 넣은 문항을 프롬프트 안에 함께
+   싣기 때문에, 복사해서 아무 AI에 붙여 넣으면 그대로 답이 나온다.
+   ====================================================================== */
+
+/* 추천 프롬프트 5가지 */
+var QUICK_TASKS = {
+  polish: {
+    label: '문항 정돈하기',
+    hint: '이미 있는 문항이나 초안을 넣으면, 자료·발문·조건으로 갈라 정돈하고 채점기준표까지 붙여 돌려줍니다.',
+    rawLabel: '고칠 문항 · 초안 <span class="tag b">필수</span>',
+    head: '아래 「교사가 넣은 것」은 다듬어야 할 서·논술형 문항 또는 그 초안이다. 이것을 학생에게 그대로 나누어 줄 수 있는 문항 한 벌로 정돈하라.',
+    keep: '원래 문항의 소재와 묻고자 한 의도를 바꾸지 않는다. 표현과 구조만 다듬는다. 소재를 바꿔야 할 이유가 있으면 바꾸지 말고 마지막 항목에 그 이유만 적는다.'
+  },
+  create: {
+    label: '구상만으로 문항 만들기',
+    hint: '아직 문항이 없어도 됩니다. “2학년 열의 이동, 실생활 사례로” 한 줄만 넣어도 완성된 문항이 나옵니다.',
+    rawLabel: '만들고 싶은 문항의 구상 <span class="tag b">필수</span>',
+    head: '아래 「교사가 넣은 것」은 아직 문항이 되지 않은 교사의 구상이다. 이것을 학생에게 그대로 나누어 줄 수 있는 문항 한 벌로 만들어라.',
+    keep: '교사가 말한 소재·단원·의도에서 벗어나지 않는다. 구상에 없는 소재를 새로 끌어들이지 않는다.'
+  },
+  rubric: {
+    label: '채점기준표만 만들기',
+    hint: '문항은 이미 확정되었고 채점기준표만 필요할 때 고르십시오. 문항은 손대지 않습니다.',
+    rawLabel: '이미 확정된 문항 <span class="tag b">필수</span>',
+    head: '아래 「교사가 넣은 것」은 이미 확정된 서·논술형 문항이다. 이 문항을 고치지 말고, 이 문항에 대한 채점기준표와 채점 자료만 만들어라.',
+    keep: '문항의 자료·발문·조건은 한 글자도 고치지 않는다. 문항에 문제가 보이면 고치지 말고 마지막 항목에 지적만 한다.'
+  },
+  review: {
+    label: '점검·수정 의견만 받기',
+    hint: '새 문항을 받는 대신, 지금 문항의 문제점과 고칠 곳만 짚어 줍니다. 결정은 교사가 합니다.',
+    rawLabel: '점검받을 문항 <span class="tag b">필수</span>',
+    head: '아래 「교사가 넣은 것」은 점검이 필요한 서·논술형 문항이다. 문항을 새로 써 주지 말고, 무엇이 문제이고 어떻게 고치면 되는지 점검 의견만 내라.',
+    keep: '완성된 대안 문항을 통째로 써 주지 않는다. 고쳐 쓸 문장이 필요한 자리에는 한 문장짜리 예시만 보인다.'
+  },
+  level: {
+    label: '난도 바꾼 변형 만들기',
+    hint: '같은 성취기준으로 쉬운 반·어려운 반, 또는 재응시용 문항이 필요할 때 고르십시오.',
+    rawLabel: '원본 문항 <span class="tag b">필수</span>',
+    head: '아래 「교사가 넣은 것」은 원본 서·논술형 문항이다. 같은 성취기준과 같은 평가 요소를 유지한 채, 난도만 달리한 변형 문항을 만들어라.',
+    keep: '측정하려는 능력을 바꾸지 않는다. 난도는 자료의 복잡도·요구 사고의 단계·조건의 개수로 조절하고, 무엇을 조절했는지 밝힌다.'
+  }
+};
+
+/* 함께 받을 것 → 출력 항목 */
+var QUICK_OUT = {
+  mat: '자료(제시문) — 학생에게 보여 줄 자료 전문. 표·그래프는 표로 옮겨 적고, 지어낸 수치라면 “가공 자료”라고 밝힌다.',
+  cond: '조건 — ① ② ③ … 학생이 읽을 문장 그대로.',
+  rub: '채점기준표 — 채점 요소 / 요소별 배점 / 수준별 수행 진술문을 갖춘 표.',
+  ans: '예시 답안 — 교사용. 실제로 학생이 쓸 만한 분량으로 쓴다.',
+  range: '유사 답안 인정 범위 — 인정하는 표현, 인정하지 않는 표현, 부분 점수를 주는 경우.',
+  why: '무엇을 왜 고쳤는가 — 원래 문항의 어느 부분을 어떤 원칙 때문에 고쳤는지 항목별로.',
+  fb: '수준별 피드백 문장 — 각 수준의 학생에게 그대로 돌려줄 문장.',
+  'var': '변형 문항 3개 — 같은 평가 요소를 유지한 채 난도와 반응 지시어만 달리한 발문 3개.'
+};
+
+/* AI 바로 보내기 — q가 있으면 주소로 입력창까지 채운다 */
+var QUICK_AI = [
+  { name: 'ChatGPT', color: '#10a37f', url: 'https://chatgpt.com/', q: '?q=' },
+  { name: 'Gemini', color: '#1a73e8', url: 'https://gemini.google.com/app', q: '' },
+  { name: 'Claude', color: '#d97757', url: 'https://claude.ai/new', q: '?q=' },
+  { name: 'Copilot', color: '#0078d4', url: 'https://copilot.microsoft.com/', q: '?q=' }
+];
+var QUICK_URL_MAX = 6000;
+
+function quickTask() {
+  return QUICK_TASKS[state.f.q_task] ? state.f.q_task : 'polish';
+}
+
+function buildQuickPrompt() {
+  var out = $('#quickPromptOut'); if (!out) return;
+
+  var task = QUICK_TASKS[quickTask()];
+  var school = F('q_school') || '중학교';
+  var subject = F('q_subject') || '과학';
+  var unit = F('q_unit');
+  var form = F('q_form');
+  var score = F('q_score') || '10';
+  var levels = F('q_levels') || '5';
+  var std = F('q_std');
+  var extra = F('q_extra');
+  var raw = (F('q_raw') || '').trim();
+  var outs = (state.chips.q_out || []);
+  var t = [];
+
+  /* --- 무엇을 시키는가 --- */
+  t.push('# 부탁');
+  t.push('너는 ' + school + ' ' + subject + ' 교과의 서·논술형 평가 문항을 다듬는 전문가다.');
+  t.push(task.head);
+  t.push('나에게 되묻지 말고, 이 한 번의 답변으로 끝까지 내라.');
+  t.push('');
+
+  t.push('# 이 부탁의 방식 — 질문하지 않는다');
+  t.push('- 확인 질문을 하지 않는다. “어떤 성취기준인가요?” 같은 되물음으로 답변을 대신하지 않는다.');
+  t.push('- 정보가 빠져 있으면 ' + school + ' ' + subject + ' 수준에서 가장 무난한 값으로 네가 임시로 정하고, 그 자리에 `(가정)`을 붙인다.');
+  t.push('- ' + task.keep);
+  t.push('- 답변 맨 끝에 「교사가 확인할 것」을 두고, `(가정)`으로 정한 항목만 모아 다시 보여 준다. 교사가 그 목록만 읽어도 무엇을 고쳐야 할지 알 수 있어야 한다.');
+  t.push('');
+
+  /* --- 조건 --- */
+  t.push('# 조건');
+  t.push('- 대상 : ' + school + ' ' + subject + (isBlank(unit) ? '' : ' · ' + unit.trim()));
+  t.push('- 문항 유형 : ' + (isBlank(form) ? '정하지 않았다. 넣은 내용에 가장 알맞은 것으로 네가 고르고 그 까닭을 한 줄로 밝혀라.' : form));
+  t.push('- 배점 : ' + score + '점');
+  t.push('- 채점 척도 : ' + levels + '단계');
+  t.push('- 성취기준 : ' + (isBlank(std)
+    ? '밝히지 않았다. 2022 개정 교육과정에서 가장 알맞은 것을 추정해 코드와 문장을 적되, 반드시 뒤에 `(확인 필요)`를 붙여라. 코드를 확신할 수 없으면 지어내지 말고 “코드 미상”이라 적고 내용만 써라.'
+    : std.trim()));
+  t.push('');
+
+  /* --- 원칙 --- */
+  t.push('# 지켜야 할 원칙');
+  t.push('- 문항은 발문·자료·조건으로 구성한다. 발문만으로 응답의 내용과 범위가 분명하면 조건을 억지로 만들지 않는다.');
+  t.push('- 발문에는 측정하려는 능력이 드러나는 반응 지시어를 쓴다(비교하시오·분석하시오·추론하시오·설계하시오·평가하시오·제안하시오 등). 반응 지시어는 교육과정 내용 체계의 과정·기능에서 가져온다.');
+  t.push('- 자료의 문장을 그대로 옮겨 적으면 답이 되어 버리지 않게 한다. 자료에 결론이 남아 있으면 그 부분을 잘라내고, 무엇을 잘라냈는지 밝힌다.');
+  t.push('- 자료는 문제 상황을 분명히 하되 과다한 정보를 담지 않는다. 자료와 발문은 서로 긴밀히 연관되어야 한다.');
+  t.push('- 조건에 정답의 전체나 일부가 암시되지 않게 한다. 쓸 개념어는 이름까지만 제시한다.');
+  t.push('- 단순 기억만으로 답할 수 있게 만들지 않는다. 배운 것을 새로운 맥락에 적용하게 한다.');
+  t.push('- 채점기준표에는 채점 요소, 요소별 배점, 수준별 수행 진술문이 모두 들어간다. 조건 하나에는 대응하는 채점 요소가 하나 있어야 한다.');
+  t.push('- 수준 간 진술은 서로 겹치지 않게(배타성), 평가하려는 능력을 빠짐없이 담아(포괄성) 쓴다. “몇 개를 썼는가”가 아니라 “어떤 질의 응답인가”로 쓴다.');
+  t.push('- 배점은 성취기준에서 그 평가 요소가 차지하는 중요도에 따라 배분한다.');
+  t.push('- 학생의 가치를 판단하는 표현은 쓰지 않는다.');
+  t.push('');
+
+  /* --- 출력 형식 --- */
+  var n = 0, sec = [];
+  /* ‘제목 — 설명’ 가운데 제목만 굵게 하여 번호를 붙인다 */
+  function outLine(key) {
+    var v = QUICK_OUT[key];
+    if (key === 'rub') v = v.replace('수준별', levels + '단계');
+    if (key === 'why' && quickTask() === 'create') v = '이렇게 만든 까닭 — 발문·자료·조건을 이렇게 정한 근거를 항목별로.';
+    var i = v.indexOf(' — ');
+    return (++n) + '. ' + (i < 0 ? '**' + v + '**' : '**' + v.slice(0, i) + '** — ' + v.slice(i + 3));
+  }
+  sec.push(++n + '. **한눈에 보기** — 대상 / 성취기준 / 평가 요소(‘~하기’ 형태로 3~5개) / 요구하는 사고(한 문장) / 문항 유형 / 배점 / 예상 응답 시간을 표로.');
+
+  if (quickTask() === 'review') {
+    sec.push(++n + '. **점검 결과** — 아래 열의 표로. `점검 항목 | 판정(적절·보완 필요·부적절) | 무엇이 문제인가 | 어떻게 고치면 되는가`');
+    sec.push('   점검 항목은 다음을 모두 다룬다 — 성취기준 부합 / 자료에 결론이 남아 있는지 / 발문의 반응 지시어 / 조건의 정답 암시 / 단순 기억으로 답할 수 있는지 / 채점 가능성 / 응답 분량과 배점의 균형 / 표현의 명료성.');
+    sec.push(++n + '. **가장 먼저 고칠 것 세 가지** — 우선순위대로. 각 항목마다 고쳐 쓴 문장을 한 문장씩만 예로 보인다.');
+  } else if (quickTask() === 'level') {
+    sec.push(++n + '. **원본 분석** — 원본이 재는 평가 요소와 사고 수준, 현재 난도를 한 문단으로.');
+    sec.push(++n + '. **변형 문항 3개** — 쉬움 · 원본과 같음 · 어려움. 각각 학생이 읽을 발문 그대로 쓰고, 필요한 자료와 조건을 함께 붙인다.');
+    sec.push(++n + '. **무엇을 조절했는가** — 세 문항을 `난도 | 자료의 복잡도 | 요구 사고의 단계 | 조건 수 | 예상 정답률`의 표로 견주어 보인다.');
+    if (outs.indexOf('rub') >= 0) sec.push(++n + '. **공통 채점기준표** — 세 문항에 함께 쓸 수 있도록 ' + levels + '단계 척도로.');
+  } else if (quickTask() === 'rubric') {
+    /* 문항은 손대지 않으므로 채점에 필요한 것만 낸다 */
+    sec.push(++n + '. **채점기준표** — 채점 요소 / 요소별 배점 / ' + levels + '단계 수행 진술문을 갖춘 표. 문항의 조건 하나에는 대응하는 채점 요소가 하나 있어야 한다.');
+    ['ans', 'range', 'fb'].forEach(function (k) {
+      if (outs.indexOf(k) >= 0) sec.push(outLine(k));
+    });
+    sec.push(++n + '. **채점 유의 사항** — 채점자마다 판단이 갈릴 만한 지점을 짚고, 각각을 어떻게 처리할지 정해 준다.');
+    if (outs.indexOf('why') >= 0) sec.push(++n + '. **문항에 대한 지적** — 문항을 고치지는 말고, 채점하며 걸리는 부분만 항목별로 적는다.');
+  } else {
+    if (outs.indexOf('mat') >= 0) sec.push(outLine('mat'));
+    sec.push(++n + '. **발문** — 학생이 읽을 문장 그대로, 다듬어진 완성형으로.');
+    ['cond', 'rub', 'ans', 'range', 'fb', 'var', 'why'].forEach(function (k) {
+      if (outs.indexOf(k) >= 0) sec.push(outLine(k));
+    });
+  }
+  sec.push(++n + '. **교사가 확인할 것** — 위에서 `(가정)`·`(확인 필요)`로 표시한 것만 번호를 붙여 모으고, 각 항목마다 “무엇을 정해야 하는지”를 한 줄씩 덧붙인다. 표시한 것이 없으면 “없음”이라고 적는다.');
+
+  t.push('# 답변 형식 — 아래 순서 그대로, 표는 표로');
+  sec.forEach(function (x) { t.push(x); });
+  t.push('');
+  t.push('- 서론이나 인사말을 붙이지 않는다. 곧바로 1번부터 시작한다.');
+  t.push('- 만들어 낼 것은 ‘학생에게 그대로 나누어 줄 문항 한 벌’이다. 학기 평가 계획표나 평가 반영 비율표를 만들지 않는다.');
+  t.push('');
+
+  /* --- 출처 --- */
+  t.push('# 자료 출처 규칙');
+  t.push('- 실제 기사·논문·통계를 인용했다면 찾아가는 경로(검색어·사이트명·자료실 이름)를 함께 적는다.');
+  t.push('- 그리고 답변 끝에 다음 문장을 반드시 그대로 덧붙인다.');
+  t.push('  “제가 제시한 출처는 부정확하거나 실제로 존재하지 않을 수 있습니다. 문항에 사용하기 전에 반드시 원문을 직접 확인하십시오.”');
+  t.push('- 확인되지 않은 수치를 사실인 것처럼 쓰지 않는다. 네가 만들어 낸 자료라면 “가공 자료”라고 먼저 밝힌다.');
+  t.push('- 넣은 내용에 학생 이름·학번 같은 개인정보가 섞여 있으면 그 부분을 지우고, 지웠다는 사실을 알린다.');
+  t.push('');
+
+  if (!isBlank(extra)) {
+    t.push('# 추가 요청');
+    extra.split('\n').forEach(function (l) { if (l.trim()) t.push('- ' + l.trim()); });
+    t.push('');
+  }
+
+  t.push('# 교사가 넣은 것');
+  t.push('"""');
+  t.push(raw || '(여기에 문항을 넣으십시오 — 위 01번 칸에 적으면 이 자리에 그대로 들어갑니다)');
+  t.push('"""');
+
+  out.textContent = t.join('\n');
+  quickSyncLabels();
+}
+
+/* 고른 추천 프롬프트에 맞추어 안내 문구를 바꾼다 */
+function quickSyncLabels() {
+  var task = QUICK_TASKS[quickTask()];
+  var h = $('#qTaskHint'); if (h) h.innerHTML = task.hint;
+  var l = $('#qRawLabel'); if (l) l.innerHTML = task.rawLabel;
+}
+
+function quickPromptText() { var o = $('#quickPromptOut'); return o ? o.textContent : ''; }
+function quickHasRaw() {
+  if (!isBlank(F('q_raw'))) return true;
+  toast('먼저 문항이나 구상을 넣어 주십시오', 'warn');
+  var ta = $('[data-k="q_raw"]');
+  if (ta) { ta.focus(); ta.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+  return false;
+}
+function copyQuick(msg) {
+  var txt = quickPromptText();
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(txt).then(function () { toast(msg, 'ok'); }, function () { legacyCopy(txt); });
+  } else legacyCopy(txt);
+}
+
+/* AI 창을 먼저 열고(클릭 제스처 유지) 이어서 복사한다 */
+function renderAiLaunch() {
+  var box = $('#aiLaunch'); if (!box) return;
+  box.innerHTML = '<span class="tiny muted" style="align-self:center;margin-right:2px">복사하고 바로 열기 →</span>' +
+    QUICK_AI.map(function (p, i) {
+      return '<button class="ai-btn" type="button" data-ai="' + i + '">' +
+        '<span class="plat-logo" style="background:' + p.color + '">' + esc(p.name.charAt(0)) + '</span>' + esc(p.name) + '</button>';
+    }).join('');
+  $$('[data-ai]', box).forEach(function (b) {
+    b.addEventListener('click', function () {
+      if (!quickHasRaw()) return;
+      var p = QUICK_AI[parseInt(b.dataset.ai, 10)];
+      var txt = quickPromptText();
+      var enc = p.q ? encodeURIComponent(txt) : '';
+      var filled = !!(p.q && enc.length <= QUICK_URL_MAX);
+      var w = window.open(filled ? p.url + p.q + enc : p.url, '_blank', 'noopener');
+      copyQuick(filled
+        ? p.name + ' 창에 프롬프트를 넣었습니다'
+        : '복사했습니다. ' + p.name + ' 입력창에 붙여넣기(Ctrl+V) 하십시오');
+      if (!w) toast('팝업이 차단되었습니다. 복사는 되었으니 직접 여십시오.', 'warn');
+    });
+  });
+}
+
+/* 간단 / 정식 모드 전환 */
+function setAgentMode(m) {
+  if (m !== 'quick') m = 'full';
+  state.f.a_mode = m; autosave();
+  $$('[data-agentmode]').forEach(function (b) { b.classList.toggle('on', b.dataset.agentmode === m); });
+  var q = $('#agentQuick'), f = $('#agentFull');
+  if (q) q.classList.toggle('on', m === 'quick');
+  if (f) f.classList.toggle('on', m === 'full');
+  if (m === 'quick') buildQuickPrompt(); else buildPrompt();
+}
+function initAgentMode() {
+  $$('[data-agentmode]').forEach(function (b) {
+    b.addEventListener('click', function () { setAgentMode(b.dataset.agentmode); });
+  });
+  renderAiLaunch();
+  if (!state.f.q_task) state.f.q_task = 'polish';
+  var r = $('input[name="q_task"][value="' + state.f.q_task + '"]');
+  if (r) r.checked = true;
+  setAgentMode(state.f.a_mode === 'quick' ? 'quick' : 'full');
+}
+
 /* 플랫폼 안내 */
 /* ======================================================================
    PART 11-b. 교수학습·평가 계획 에이전트
@@ -2417,6 +2685,18 @@ function initActions() {
         function () { legacyCopy(txt); });
     } else legacyCopy(txt);
   });
+  var cq = $('#btnCopyQuick');
+  if (cq) cq.addEventListener('click', function () {
+    if (!quickHasRaw()) return;
+    copyQuick('추천 프롬프트를 복사했습니다. AI 입력창에 붙여 넣으십시오');
+  });
+  var dq = $('#btnDownloadQuick');
+  if (dq) dq.addEventListener('click', function () {
+    var blob = new Blob([quickPromptText()], { type: 'text/plain;charset=utf-8' });
+    downloadBlob(blob, '서논술형_간단버전_프롬프트_' + stamp() + '.txt');
+    toast('프롬프트를 파일로 저장했습니다', 'ok');
+  });
+
   $('#btnDownloadPrompt').addEventListener('click', function () {
     var blob = new Blob([$('#promptOut').textContent], { type: 'text/plain;charset=utf-8' });
     downloadBlob(blob, '서논술형_에이전트_지시문_' + stamp() + '.txt');
@@ -2540,6 +2820,8 @@ function init() {
   step('itemDoc', renderItemDoc);
   step('rubricDoc', renderRubricDoc);
   step('prompt', buildPrompt);
+  step('quickPrompt', buildQuickPrompt);
+  step('agentMode', initAgentMode);
   step('planPrompt', buildPlanPrompt);
 
   step('goTab', function () {

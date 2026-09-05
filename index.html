@@ -691,6 +691,40 @@ html[data-theme="dark"] .prompt-out { background: #0e1424; }
 .plat-panel { display: none; }
 .plat-panel.on { display: block; animation: panelIn .32s cubic-bezier(.2,.8,.3,1); }
 
+/* ---------- 18-b. 에이전트 모드 전환(간단 / 정식) ---------- */
+.mode-switch { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0 2px; }
+.mode-btn {
+  appearance: none; cursor: pointer; font-family: inherit; text-align: left;
+  display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: 15px;
+  background: var(--surface); border: 1.5px solid var(--line);
+  transition: all .2s cubic-bezier(.2,.8,.3,1);
+}
+.mode-btn:hover { transform: translateY(-2px); border-color: var(--line-2); box-shadow: var(--shadow-1); }
+.mode-btn.on { border-color: var(--brand); background: var(--brand-soft); box-shadow: 0 6px 18px rgba(47,109,246,.15); }
+.mode-ico {
+  width: 34px; height: 34px; border-radius: 10px; flex: none; display: grid; place-items: center;
+  background: var(--surface-2); border: 1px solid var(--line); color: var(--text-3);
+}
+.mode-ico svg { width: 17px; height: 17px; }
+.mode-btn.on .mode-ico { background: linear-gradient(135deg, var(--brand), var(--brand-2)); border-color: transparent; color: #fff; }
+.mode-btn b { display: block; font-size: 14px; font-weight: 800; letter-spacing: -.02em; color: var(--text); }
+.mode-btn i { display: block; font-style: normal; font-size: 12px; line-height: 1.62; margin-top: 4px; color: var(--text-3); }
+.mode-btn.on i { color: var(--text-2); }
+.agent-mode { display: none; }
+.agent-mode.on { display: block; animation: panelIn .32s cubic-bezier(.2,.8,.3,1); }
+@media (max-width: 720px) { .mode-switch { grid-template-columns: 1fr; } }
+
+/* AI로 바로 보내기 */
+.ai-launch { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.ai-btn {
+  appearance: none; cursor: pointer; font-family: inherit; font-size: 12.8px; font-weight: 700;
+  display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px; border-radius: 11px;
+  background: var(--surface-2); border: 1px solid var(--line); color: var(--text);
+  transition: all .2s cubic-bezier(.2,.8,.3,1);
+}
+.ai-btn:hover { transform: translateY(-1px); border-color: var(--line-2); box-shadow: var(--shadow-1); }
+.ai-btn .plat-logo { width: 19px; height: 19px; font-size: 10px; }
+
 .steps { counter-reset: st; display: flex; flex-direction: column; gap: 0; }
 .step { position: relative; padding: 0 0 18px 42px; counter-increment: st; }
 .step::before {
@@ -961,6 +995,8 @@ html[data-theme="dark"] .prompt-out { background: #0e1424; }
   .acc-body { display: block !important; }
   .plat-panel { display: block !important; break-before: page; }
   .plat-tabs { display: none !important; }
+  .agent-mode { display: block !important; }
+  .mode-switch { display: none !important; }
   body.print-node .topbar, body.print-node .tabbar, body.print-node main.wrap,
   body.print-node footer, body.print-node .fab-wrap { display: none !important; }
   body.print-node #printHost { display: block !important; }
@@ -2322,8 +2358,166 @@ html[data-theme="dark"] .prompt-out { background: #0e1424; }
       STEP 4 · 문항을 대신 만들지 않고, 절차를 안내하는 조수
     </div>
     <h1>서·논술형 평가 에이전트 만들기</h1>
-    <p>좋은 문항은 교사가 <b>결정</b>해야 나옵니다. 그래서 이 에이전트는 완성품을 내놓지 않고, 교사가 한 단계씩 결정하도록 <b>한 번에 하나씩 묻는</b> 방식으로 설계합니다. 아래에서 조건을 고르면 그대로 붙여 넣을 수 있는 지시문이 만들어집니다.</p>
+    <p>좋은 문항은 교사가 <b>결정</b>해야 나옵니다. 그래서 이 에이전트는 완성품을 내놓지 않고, 교사가 한 단계씩 결정하도록 <b>한 번에 하나씩 묻는</b> 방식으로 설계합니다. 다만 시간이 없을 때를 위해 <b>한 번에 답을 받는 간단 버전</b>도 함께 두었습니다. 아래에서 방식을 고르십시오.</p>
   </div>
+
+  <!-- ===== 5-0 모드 전환 ===== -->
+  <div class="mode-switch no-print" id="agentModes">
+    <button class="mode-btn" type="button" data-agentmode="quick">
+      <span class="mode-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4.5 13.5H11l-1 8.5L19.5 10H13z"/></svg></span>
+      <span><b>간단 버전 · 문항 넣고 바로 받기</b><i>고치고 싶은 문항이나 한 줄 구상을 넣으면, 되묻지 않고 정돈된 문항 한 벌을 한 번에 돌려주는 프롬프트가 만들어집니다. AI에 붙여 넣으면 곧바로 답이 나옵니다.</i></span>
+    </button>
+    <button class="mode-btn on" type="button" data-agentmode="full">
+      <span class="mode-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></span>
+      <span><b>정식 버전 · 단계별로 묻는 조수</b><i>성취기준부터 채점기준표까지 한 번에 하나씩 물어 가며 교사가 직접 결정하도록 이끄는 에이전트 지시문을 만듭니다. 오래 쓸 챗봇을 만들 때 쓰십시오.</i></span>
+    </button>
+  </div>
+
+<!-- ================= 간단 버전 ================= -->
+<div class="agent-mode" id="agentQuick">
+
+  <div class="section-title">01. 문항 넣기</div>
+  <div class="card">
+    <div class="card-head">
+      <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></div>
+      <div><h2>고치고 싶은 문항을 그대로 붙여 넣으십시오</h2><p class="desc">한 줄 구상도 좋고, 지난 학기 문항 전체를 넣어도 됩니다. 빠진 정보는 AI가 임시로 정하되 <b>(가정)</b> 표시를 붙여 돌려주므로, 교사가 고칠 자리가 한눈에 보입니다.</p></div>
+    </div>
+
+    <div class="field"><label>추천 프롬프트 고르기 <span class="tag b">한 번에 답이 나오는 5가지</span></label>
+      <div class="pillset" data-radioset="q_task" data-k="q_task" data-agentq="1">
+        <label class="pill"><input type="radio" name="q_task" value="polish"><span>① 문항 정돈하기</span></label>
+        <label class="pill"><input type="radio" name="q_task" value="create"><span>② 구상만으로 문항 만들기</span></label>
+        <label class="pill"><input type="radio" name="q_task" value="rubric"><span>③ 채점기준표만 만들기</span></label>
+        <label class="pill"><input type="radio" name="q_task" value="review"><span>④ 점검·수정 의견만 받기</span></label>
+        <label class="pill"><input type="radio" name="q_task" value="level"><span>⑤ 난도 바꾼 변형 만들기</span></label>
+      </div>
+      <p class="hint" id="qTaskHint"></p>
+    </div>
+
+    <div class="field"><label id="qRawLabel">문항 · 구상 <span class="tag b">필수</span></label>
+      <textarea data-k="q_raw" data-agentq="1" rows="8" placeholder="예) 광합성에 영향을 주는 요인 실험 결과 그래프를 주고, 왜 그런 결과가 나왔는지 서술하게 하고 싶습니다.&#10;&#10;예) 다음 실험 결과를 보고 그 까닭을 서술하시오.  ← 이미 써 둔 문항을 통째로 붙여 넣어도 됩니다.&#10;&#10;예) 2학년 열의 이동, 실생활 사례로 논술형 하나."></textarea>
+      <p class="hint">학생 이름·학번 등 <b>개인정보는 넣지 마십시오.</b> 저작권이 있는 지문은 출처를 밝혀 인용 범위 안에서만 사용하십시오.</p>
+    </div>
+
+    <div class="grid g3">
+      <div class="field"><label>학교급</label>
+        <select data-k="q_school" data-agentq="1">
+          <option>초등학교</option><option selected>중학교</option><option>고등학교</option>
+        </select>
+      </div>
+      <div class="field"><label>과목</label>
+        <input type="text" data-k="q_subject" data-agentq="1" value="과학" placeholder="예) 과학 / 통합과학 / 물리학">
+      </div>
+      <div class="field"><label>학년 · 단원 <span class="tag">선택</span></label>
+        <input type="text" data-k="q_unit" data-agentq="1" placeholder="예) 2학년 · 열의 이동">
+      </div>
+    </div>
+
+    <div class="grid g3">
+      <div class="field"><label>문항 유형</label>
+        <select data-k="q_form" data-agentq="1">
+          <option value="">AI가 알아서 판단</option>
+          <option>서술형</option>
+          <option>논술형(제한형)</option>
+          <option>논술형(확장형)</option>
+          <option>서술 + 논술 단계형</option>
+        </select>
+      </div>
+      <div class="field"><label>배점</label>
+        <input type="number" data-k="q_score" data-agentq="1" min="1" max="100" value="10">
+      </div>
+      <div class="field"><label>채점 척도</label>
+        <select data-k="q_levels" data-agentq="1">
+          <option value="3">3단계</option>
+          <option value="4">4단계</option>
+          <option value="5" selected>5단계</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field"><label>함께 받을 것</label>
+      <div class="chips" data-chipset="q_out" data-k="q_out" data-agentq="1">
+        <button class="chip on" type="button" data-v="mat">자료(제시문)</button>
+        <button class="chip on" type="button" data-v="cond">조건</button>
+        <button class="chip on" type="button" data-v="rub">채점기준표</button>
+        <button class="chip on" type="button" data-v="ans">예시 답안</button>
+        <button class="chip on" type="button" data-v="range">유사 답안 인정 범위</button>
+        <button class="chip on" type="button" data-v="why">무엇을 왜 고쳤는지</button>
+        <button class="chip" type="button" data-v="fb">수준별 피드백 문장</button>
+        <button class="chip" type="button" data-v="var">난도가 다른 변형 문항 3개</button>
+      </div>
+      <p class="hint">끄면 그 항목은 답변에서 빠집니다. 짧게 받고 싶으시면 앞의 네 개만 켜 두십시오.</p>
+    </div>
+
+    <div class="grid g2">
+      <div class="field"><label>성취기준 코드 <span class="tag">선택</span></label>
+        <input type="text" data-k="q_std" data-agentq="1" placeholder="예) [9과06-02]">
+        <p class="hint">비워 두면 AI가 추정한 뒤 <b>(확인 필요)</b> 표시를 붙입니다.</p>
+      </div>
+      <div class="field"><label>추가 요청 <span class="tag">선택</span></label>
+        <textarea data-k="q_extra" data-agentq="1" rows="2" placeholder="예) 조건은 3개 이내로.&#10;예) 실험 결과 해석 중심으로."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">02. 복사해서 AI에 넣기</div>
+  <div class="card">
+    <div class="card-head">
+      <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      <div><h2>아래를 통째로 복사해 AI에 붙여 넣으면 끝입니다</h2><p class="desc">되묻지 않고 첫 답변에서 자료·발문·조건·채점기준표까지 한 번에 나오도록 쓴 프롬프트입니다.</p></div>
+      <div class="card-head-tools no-print">
+        <button class="btn btn-sm btn-primary" id="btnCopyQuick">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          복사
+        </button>
+        <button class="btn btn-sm" id="btnDownloadQuick">.txt 저장</button>
+        <button class="btn btn-sm" data-word="quickPromptOut" data-name="서논술형_간단버전_프롬프트" data-title="서·논술형 문항 정돈 프롬프트">Word</button>
+      </div>
+    </div>
+
+    <div class="ai-launch no-print" id="aiLaunch"></div>
+    <div class="prompt-out" id="quickPromptOut"></div>
+
+    <div class="note note-info mt12">
+      <div class="note-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>버튼을 누르면 이렇게 됩니다</div>
+      프롬프트가 <b>클립보드에 복사되고</b> 해당 AI가 새 창으로 열립니다. 길이가 짧으면 입력창까지 자동으로 채워지고, 길면 붙여넣기(<b>Ctrl+V</b> · 맥은 <b>⌘V</b>)만 하시면 됩니다. 서울시교육청 <b>SENGPT</b>처럼 목록에 없는 서비스는 <b>복사</b> 버튼을 누른 뒤 붙여 넣으십시오.
+    </div>
+    <div class="note note-warn mt12">
+      <div class="note-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>돌아온 답은 초안입니다</div>
+      간단 버전은 <b>속도를 얻는 대신 교사가 할 결정을 AI의 가정으로 대신</b>합니다. 답변 끝의 <b>「교사가 확인할 것」</b> 목록을 반드시 읽고, 성취기준 코드와 자료 출처는 원문으로 확인하십시오. 결정을 직접 하시려면 위에서 <b>정식 버전</b>으로 바꾸십시오.
+    </div>
+  </div>
+
+  <div class="section-title">03. 답변을 받은 뒤에 할 일</div>
+  <div class="card">
+    <div class="steps">
+      <div class="step">
+        <h5>(가정) 표시부터 찾기</h5>
+        <p>AI가 교사 대신 정한 자리에는 모두 <b>(가정)</b>이 붙어 있습니다. 그 항목만 고쳐도 문항의 절반은 우리 교실 것이 됩니다. 성취기준·배점·척도 단계를 먼저 보십시오.</p>
+      </div>
+      <div class="step">
+        <h5>자료에 결론이 남아 있는지 보기</h5>
+        <p>제시문의 문장을 그대로 옮겨 적으면 답이 되어 버리는지 학생의 눈으로 읽어 보십시오. 그렇다면 그 문장을 지목해 “이 문장을 지우고 다시 써 달라”고 이어서 요청하십시오.</p>
+      </div>
+      <div class="step">
+        <h5>조건과 채점 요소를 짝지어 보기</h5>
+        <p>조건 ①에 대응하는 채점 요소가 없으면 채점할 수 없는 조건입니다. 짝이 맞지 않는 것을 찾아 “조건 ②에 대응하는 채점 요소가 없다. 고쳐 달라”고 그 자리에서 이어 말하면 됩니다.</p>
+      </div>
+      <div class="step">
+        <h5>출처는 반드시 원문으로</h5>
+        <p>AI가 제시한 기사·논문·통계는 <b>실재하지 않을 수 있습니다.</b> 검색어와 사이트명을 따라가 원문을 직접 확인한 뒤에만 학생에게 나누어 주십시오.</p>
+      </div>
+      <div class="step">
+        <h5>교과협의회 검토 거치기</h5>
+        <p>AI가 만든 문항과 채점기준은 초안입니다. 동교과 교사와 채점기준 해석을 맞춰 두어야 채점자 간 신뢰도가 확보됩니다.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ================= 정식 버전 ================= -->
+<div class="agent-mode on" id="agentFull">
 
   <!-- 5-1 설계 원칙 -->
   <div class="section-title">01. 왜 ‘절차 안내형’으로 만들어야 하는가</div>
@@ -2486,6 +2680,8 @@ html[data-theme="dark"] .prompt-out { background: #0e1424; }
       </div>
     </div>
   </div>
+
+</div><!-- /#agentFull -->
 
 </section>
 
@@ -2770,7 +2966,7 @@ html[data-theme="dark"] .prompt-out { background: #0e1424; }
 
 <div id="toast" role="status" aria-live="polite"></div>
 
-<script src="assets/standards.js?v=20260905b"></script>
-<script src="assets/app.js?v=20260905b"></script>
+<script src="assets/standards.js?v=20260905c"></script>
+<script src="assets/app.js?v=20260905c"></script>
 </body>
 </html>
