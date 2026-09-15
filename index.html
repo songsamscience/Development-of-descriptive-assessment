@@ -974,6 +974,32 @@ html[data-theme="dark"] .prompt-out { background: #0e1424; }
 .links a:hover { transform: translateY(-2px); border-color: var(--brand); color: var(--brand); box-shadow: var(--shadow-1); }
 .links a svg { width: 14px; height: 14px; flex: none; }
 
+
+/* 에이전트 입력 흐름 */
+.agent-details { border: 1px solid var(--line); border-radius: var(--r); margin-top: 18px; background: var(--surface); }
+.agent-details > summary { padding: 15px 18px; cursor: pointer; font-size: 14px; font-weight: 800; color: var(--text); }
+.agent-details > summary span { font-size: 12px; font-weight: 400; color: var(--text-3); margin-left: 8px; }
+.agent-details[open] > summary { border-bottom: 1px solid var(--line); }
+.agent-details.card { padding: 0; }
+.details-body { padding: 18px; }
+.agent-status { padding: 12px 15px; margin: 6px 0 16px; background: var(--brand-soft); border: 1px solid var(--line); border-radius: 10px; color: var(--text-2); font-size: 13px; line-height: 1.7; overflow-wrap: anywhere; }
+.agent-subtitle { margin: 0 0 18px; font-size: 16px; }
+.rep-body.task { grid-template-columns: minmax(140px,.8fr) minmax(180px,1.6fr) 110px; align-items: start; }
+.task-field { display: block; min-width: 0; font-size: 12px; font-weight: 700; color: var(--text-2); }
+.task-field input { display: block; margin-top: 6px; }
+.task-field small { font-weight: 400; color: var(--text-3); }
+#p5 .field-head, #p7 .field-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.agent-details summary:focus-visible { outline: 3px solid var(--brand); outline-offset: 3px; }
+@media (max-width: 720px) {
+  #p5 .card-head, #p7 .card-head { flex-wrap: wrap; }
+  #p5 .card-head > div:nth-child(2), #p7 .card-head > div:nth-child(2) { flex: 1; min-width: 0; }
+  #p5 .card-head-tools, #p7 .card-head-tools { flex-basis: 100%; margin-left: 0; flex-wrap: wrap; }
+  .rep-body.task { grid-template-columns: minmax(0,1fr) 90px; }
+  .task-field-topic { grid-column: 1 / -1; grid-row: 2; }
+  .agent-details > summary span { display: block; margin: 5px 0 0; }
+  .details-body { padding: 14px; }
+}
+
 /* ---------- 22. 인쇄 (PDF 저장) ---------- */
 @media print {
   @page { size: A4; margin: 12mm 11mm; }
@@ -2355,10 +2381,10 @@ html[data-theme="dark"] .prompt-out { background: #0e1424; }
   <div class="hero">
     <div class="hero-badge">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><rect x="4" y="8" width="16" height="12" rx="3"/><path d="M12 8V4M9 2h6"/><circle cx="9" cy="14" r="1.2"/><circle cx="15" cy="14" r="1.2"/></svg>
-      STEP 4 · 문항을 대신 만들지 않고, 절차를 안내하는 조수
+      STEP 4 · 핵심 질문 2~3개로 문항 한 벌 완성
     </div>
     <h1>서·논술형 평가 에이전트 만들기</h1>
-    <p>좋은 문항은 교사가 <b>결정</b>해야 나옵니다. 그래서 이 에이전트는 완성품을 내놓지 않고, 교사가 한 단계씩 결정하도록 <b>한 번에 하나씩 묻는</b> 방식으로 설계합니다. 다만 시간이 없을 때를 위해 <b>한 번에 답을 받는 간단 버전</b>도 함께 두었습니다. 아래에서 방식을 고르십시오.</p>
+    <p>만들고 싶은 문항과 평가할 사고만 알려 주십시오. 정식 버전은 <b>핵심 질문 2개, 꼭 필요한 경우에만 1개 추가</b>한 뒤 자료·발문·조건·채점기준·예시답안을 한 번에 만듭니다. 이미 알려 준 내용은 다시 묻지 않고, 세부 조건은 추천값으로 제안합니다.</p>
   </div>
 
   <!-- ===== 5-0 모드 전환 ===== -->
@@ -2369,7 +2395,7 @@ html[data-theme="dark"] .prompt-out { background: #0e1424; }
     </button>
     <button class="mode-btn on" type="button" data-agentmode="full">
       <span class="mode-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></span>
-      <span><b>정식 버전 · 단계별로 묻는 조수</b><i>성취기준부터 채점기준표까지 한 번에 하나씩 물어 가며 교사가 직접 결정하도록 이끄는 에이전트 지시문을 만듭니다. 오래 쓸 챗봇을 만들 때 쓰십시오.</i></span>
+      <span><b>정식 버전 · 핵심 질문 2~3개</b><i>단원·구상과 평가할 사고를 확인한 뒤 문항 한 벌을 만듭니다. 필요한 질문만 묶어 받고, 나머지는 추천값으로 채웁니다.</i></span>
     </button>
   </div>
 
@@ -2519,22 +2545,12 @@ html[data-theme="dark"] .prompt-out { background: #0e1424; }
 <!-- ================= 정식 버전 ================= -->
 <div class="agent-mode on" id="agentFull">
 
-  <!-- 5-1 설계 원칙 -->
-  <div class="section-title">01. 왜 ‘절차 안내형’으로 만들어야 하는가</div>
+  <div class="section-title">01. AI와 나눌 대화는 이 정도면 충분합니다</div>
   <div class="card">
-    <div class="grid g3">
-      <div class="dok l3">
-        <div class="dok-lv">Principle 01</div><h5>결정권은 교사에게</h5>
-        <p>어느 성취기준으로 할지, 어떤 사고를 요구할지, 배점과 척도를 몇 단계로 할지는 <b>수업을 한 사람</b>만 알 수 있습니다. AI가 추측해 정하면 수업–평가 연계가 끊어집니다.</p>
-      </div>
-      <div class="dok l2">
-        <div class="dok-lv">Principle 02</div><h5>한 번에 한 단계씩</h5>
-        <p>여러 단계를 한 답변에 몰아서 끝내면 교사는 검토할 수 없습니다. 앞 단계가 확정되기 전에는 다음 단계를 제안하지 않도록 못 박습니다.</p>
-      </div>
-      <div class="dok l4">
-        <div class="dok-lv">Principle 03</div><h5>출처는 반드시 원문 확인</h5>
-        <p>생성형 AI는 실재하지 않는 기사·논문·통계를 그럴듯하게 제시합니다. 자료를 제안할 때마다 <b>확인 경고와 찾아가는 경로</b>를 함께 내도록 규칙에 넣습니다.</p>
-      </div>
+    <div class="grid g3 agent-flow">
+      <div class="dok l3"><div class="dok-lv">질문 01</div><h5>어떤 문항을 만들까요?</h5><p>학년·단원과 한 줄 구상 또는 기존 문항을 알려 주세요. 이미 입력했다면 건너뜁니다.</p></div>
+      <div class="dok l2"><div class="dok-lv">질문 02</div><h5>어떤 사고를 볼까요?</h5><p>자료 해석·개념 적용·근거 있는 논증 중 고르거나, <b>“추천대로”</b>라고 답해도 됩니다.</p></div>
+      <div class="dok l4"><div class="dok-lv">필요할 때만 +1</div><h5>꼭 맞춰야 할 조건은?</h5><p>문항을 크게 바꾸는 조건 하나만 확인합니다. 답을 받으면 추가 확인 없이 <b>문항 한 벌</b>을 완성합니다.</p></div>
     </div>
     <div class="note note-warn mt16">
       <div class="note-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>사용 전 반드시 확인</div>
@@ -2543,11 +2559,11 @@ html[data-theme="dark"] .prompt-out { background: #0e1424; }
   </div>
 
   <!-- 5-2 프롬프트 빌더 -->
-  <div class="section-title">02. 에이전트 지시문 만들기</div>
+  <div class="section-title" id="agentBuilder">02. 기본 정보만 넣고 지시문 만들기</div>
   <div class="card">
     <div class="card-head">
       <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17l6-6-6-6M12 19h8"/></svg></div>
-      <div><h2>조건을 고르면 지시문이 완성됩니다</h2><p class="desc">교육청 서·논술형 평가 자료의 절차와 점검 항목을 근거로 구성했습니다.</p></div>
+      <div><h2>아는 내용만 미리 입력하세요</h2><p class="desc">입력한 내용은 AI가 다시 묻지 않습니다. 비워 두어도 핵심 질문 안에서 확인하며 진행합니다.</p></div>
     </div>
     <div class="grid g2">
       <div class="field"><label>대상 학교급</label>
@@ -2559,11 +2575,31 @@ html[data-theme="dark"] .prompt-out { background: #0e1424; }
         <input type="text" data-k="a_subject" data-agent="1" value="과학" placeholder="예) 과학 / 통합과학 / 물리학">
       </div>
     </div>
+    <div class="field"><label for="a_context">문항 구상 · 기존 문항 <span class="tag">선택</span></label>
+      <textarea id="a_context" data-k="a_context" data-agent="1" rows="3" placeholder="예) 중2 열의 이동. 보온병의 구조를 보고 열 전달을 줄이는 원리를 설명하는 문항.&#10;기존 문항을 그대로 붙여 넣어도 됩니다."></textarea>
+    </div>
+    <div class="grid g2">
+      <div class="field"><label for="a_focus">평가할 사고</label>
+        <select id="a_focus" data-k="a_focus" data-agent="1"><option value="">AI와 핵심 질문에서 정하기</option><option>자료 해석·비교</option><option>개념 적용·원인 설명</option><option>근거를 들어 추론·논증</option><option>탐구 설계·해결 방안 제안</option><option>단원과 구상에 맞게 AI 추천</option></select>
+      </div>
+      <div class="field"><label for="a_questionLimit">질문 수 상한</label>
+        <select id="a_questionLimit" data-k="a_questionLimit" data-agent="1"><option value="3">핵심 2개 + 필요할 때만 1개 (추천)</option><option value="2">최대 2개로 바로 만들기</option></select>
+      </div>
+    </div>
+    <div class="agent-status" id="a_promptStatus" role="status" aria-live="polite"></div>
+    <details class="agent-details">
+      <summary>세부 설정 <span>배점·시간·검토 기준 등을 바꾸려면 펼치세요</span></summary>
+      <div class="details-body">
+        <div class="grid g3">
+          <div class="field"><label for="a_score">기본 배점</label><input id="a_score" type="number" min="1" max="100" value="10" data-k="a_score" data-agent="1"></div>
+          <div class="field"><label for="a_time">응답 시간 (분)</label><input id="a_time" type="number" min="1" max="180" value="15" data-k="a_time" data-agent="1"></div>
+          <div class="field"><label for="a_levels">채점 척도</label><select id="a_levels" data-k="a_levels" data-agent="1"><option value="3">3단계</option><option value="4">4단계</option><option value="5" selected>5단계</option></select></div>
+        </div>
     <div class="field"><label>에이전트 이름</label>
       <input type="text" data-k="a_name" data-agent="1" placeholder="예) 송쌤 서·논술형 문항 개발 조수">
     </div>
 
-    <div class="field"><label>진행 절차 <span class="tag b">순서대로 한 단계씩</span></label>
+    <div class="field"><label>AI가 내부에서 검토할 절차 <span class="tag b">추가 질문 없음</span></label>
       <div class="chips" data-chipset="a_steps" data-k="a_steps" data-agent="1">
         <button class="chip on" type="button" data-v="성취기준·성취수준 확인">① 성취기준·성취수준 확인</button>
         <button class="chip on" type="button" data-v="평가 요소 도출">② 평가 요소 도출</button>
@@ -2575,21 +2611,10 @@ html[data-theme="dark"] .prompt-out { background: #0e1424; }
         <button class="chip" type="button" data-v="예시 답안과 인정 범위 확정">⑧ 예시 답안·인정 범위</button>
         <button class="chip" type="button" data-v="성취수준별 피드백 문장 작성">⑨ 수준별 피드백 문장</button>
       </div>
-      <p class="hint">클릭해서 켜고 끌 수 있습니다. 선택한 순서대로 지시문에 반영됩니다.</p>
+      <p class="hint">선택한 항목은 AI가 스스로 검토합니다. 문항·채점기준·예시답안은 기본으로 함께 만듭니다.</p>
     </div>
 
-    <div class="field"><label>질문 규칙</label>
-      <div class="chips" data-chipset="a_rules" data-k="a_rules" data-agent="1">
-        <button class="chip on" type="button" data-v="one">한 번에 질문 하나만</button>
-        <button class="chip on" type="button" data-v="choice">초안은 2~3개 선택지로</button>
-        <button class="chip on" type="button" data-v="ask">교사 결정 사항은 반드시 질문</button>
-        <button class="chip on" type="button" data-v="reask">답이 모호하면 되묻기</button>
-        <button class="chip on" type="button" data-v="short">답변은 짧게</button>
-        <button class="chip" type="button" data-v="korean">모든 답변은 한국어로</button>
-      </div>
-    </div>
-
-    <div class="field"><label>교사에게 반드시 물어야 할 항목</label>
+    <div class="field"><label>추천값을 정할 때 고려할 항목</label>
       <div class="chips" data-chipset="a_asks" data-k="a_asks" data-agent="1">
         <button class="chip on" type="button" data-v="어느 성취기준으로 할지">성취기준 선택</button>
         <button class="chip on" type="button" data-v="어떤 사고를 요구할지">요구할 사고</button>
@@ -2602,7 +2627,7 @@ html[data-theme="dark"] .prompt-out { background: #0e1424; }
       </div>
     </div>
 
-    <div class="field"><label>단계별 점검 질문 포함</label>
+    <div class="field"><label>AI 자체 점검 항목</label>
       <div class="chips" data-chipset="a_checks" data-k="a_checks" data-agent="1">
         <button class="chip on" type="button" data-v="mat">자료 · 결론이 남아 있는지</button>
         <button class="chip on" type="button" data-v="q">발문 · 옮겨 적으면 답이 되는지</button>
@@ -2615,10 +2640,12 @@ html[data-theme="dark"] .prompt-out { background: #0e1424; }
     <div class="field"><label>추가로 넣을 지시 (선택)</label>
       <textarea data-k="a_extra" data-agent="1" rows="3" placeholder="예) 우리 학교는 3수준(A/B/C) 체계를 쓰므로 척도는 3단계를 기본으로 제안할 것.&#10;예) 실험 기반 문항을 우선 제안할 것."></textarea>
     </div>
-    <div class="field mb0"><label>첫 질문</label>
+    <div class="field mb0"><label>시작 문구 <span class="tag">선택</span></label>
       <input type="text" data-k="a_first" data-agent="1" placeholder="예) 어떤 문항을 만들고 싶으신지 편하게 적어 주십시오. 한 줄 구상도 좋고, 고치고 싶은 기존 문항을 그대로 붙여 넣으셔도 됩니다.">
-      <p class="hint">이 조수는 교사가 만들고 싶은 문항을 먼저 받고, 부족한 정보를 되물어 가며 다듬는 방식으로 진행합니다.</p>
+      <p class="hint">시작 문구는 첫 핵심 질문에 합쳐 사용합니다. 별도의 확인 질문은 추가하지 않습니다.</p>
     </div>
+      </div>
+    </details>
   </div>
 
   <!-- 5-3 결과 -->
@@ -2637,7 +2664,8 @@ html[data-theme="dark"] .prompt-out { background: #0e1424; }
         <button class="btn btn-sm" data-word="promptOut" data-name="서논술형_에이전트_지시문" data-title="서·논술형 평가 에이전트 지시문">Word</button>
       </div>
     </div>
-    <div class="prompt-out" id="promptOut"></div>
+    <div class="agent-status">핵심 질문 → 추천 문항 1개 · 채점기준 · 예시답안 · 확인할 가정</div>
+    <div class="prompt-out" id="promptOut" tabindex="0" aria-label="문항 에이전트 지시문"></div>
     <div class="note note-info mt12">
       <b>지식 파일로 함께 올리면 좋은 자료</b> · ① 우리 학교 학업성적관리시행지침 ② 해당 학년 교육과정 성취기준·성취수준 ③ 지난 학기 문항과 채점기준표 ④ 수업에서 실제로 사용한 학습지·실험보고서 양식. 이 자료가 있으면 에이전트가 <b>우리 교실 맥락</b>에 맞춰 질문합니다.
     </div>
@@ -2664,11 +2692,11 @@ html[data-theme="dark"] .prompt-out { background: #0e1424; }
     <div class="steps">
       <div class="step">
         <h5>같은 단원으로 3번 돌려 보기</h5>
-        <p>같은 성취기준으로 세 번 대화해 보면 에이전트가 어느 단계에서 앞서 나가는지, 어떤 질문을 빠뜨리는지 드러납니다. 그 지점을 지시문에 한 문장씩 추가하십시오.</p>
+        <p>같은 단원으로 세 번 대화해 보고, 질문이 최대 2~3개에서 끝나는지와 문항·채점기준·예시답안이 함께 나오는지 확인하십시오.</p>
       </div>
       <div class="step">
-        <h5>일부러 순서를 건너뛰어 보기</h5>
-        <p>“자료부터 찾아 줘”라고 말해 보십시오. 에이전트가 이전 단계로 되돌리지 못하면 “앞 단계가 확정되기 전에는 다음 단계를 제안하지 마라”는 지시가 약한 것입니다.</p>
+        <h5>“추천대로”로 바로 받아 보기</h5>
+        <p>“추천대로 바로 만들어 줘”라고 말해 보십시오. 추가 질문 없이 문항을 만들고, AI가 정한 배점·시간 등은 추천값으로 구분해야 합니다.</p>
       </div>
       <div class="step">
         <h5>가짜 출처를 시험하기</h5>
@@ -2685,8 +2713,6 @@ html[data-theme="dark"] .prompt-out { background: #0e1424; }
 
 </section>
 
-</main>
-
 <!-- ================================================================
      7. 교수학습·평가 계획 에이전트
      ================================================================ -->
@@ -2698,49 +2724,18 @@ html[data-theme="dark"] .prompt-out { background: #0e1424; }
       STEP 5 · 한 학기 전체를 한 번에 설계하는 만능 지시문
     </div>
     <h1>교수학습·평가 계획 에이전트 만들기</h1>
-    <p>앞 메뉴가 <b>문항 하나</b>를 만드는 조수였다면, 이 에이전트는 <b>한 학기 계획서 전체</b>를 만듭니다. 학년·학기·과목·단원과 평가 반영 비율만 정하면 운영 계획표, 학기 단위 성취수준, 반영 비율표, 수행평가 루브릭까지 한 번에 뽑아 주는 지시문이 완성됩니다. 아래에서 비율을 조정하면 기준 충족 여부가 즉시 표시됩니다.</p>
-  </div>
-
-  <!-- 7-1 기준 -->
-  <div class="section-title">01. 이 에이전트가 지키는 기준</div>
-  <div class="card">
-    <div class="card-head">
-      <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></div>
-      <div><h2>학생평가 내실화 방향을 지시문에 못 박습니다</h2><p class="desc">AI가 임의로 비율을 정하지 못하도록, 교사가 정한 수치를 지시문 안에 고정값으로 넣습니다.</p></div>
-    </div>
-    <div class="grid g2">
-      <div class="dok l3">
-        <div class="dok-lv">Rule 01</div><h5>수행평가 비중 확보</h5>
-        <p>학기 성적에서 수행평가가 차지하는 비율을 <b>먼저</b> 정하고, 정기고사는 그 나머지로 맞춥니다. 과제 구성은 교사가 직접 적습니다.</p>
-      </div>
-      <div class="dok l2">
-        <div class="dok-lv">Rule 02</div><h5>서·논술형 30% 이상</h5>
-        <p>정기고사 안의 서·논술형과 수행평가를 <b>합산</b>해 계산합니다. 아래 게이지가 실시간으로 충족 여부를 보여 줍니다.</p>
-      </div>
-      <div class="dok l4">
-        <div class="dok-lv">Rule 03</div><h5>수업 중 과정 평가</h5>
-        <p>가정에서 해 오는 과제형 수행평가와 단편적 지식 암기를 <b>금지 사항</b>으로 명시합니다. 실험·실습을 반드시 포함시킵니다.</p>
-      </div>
-      <div class="dok l1">
-        <div class="dok-lv">Rule 04</div><h5>백워드 설계</h5>
-        <p>목표(바라는 결과) → 평가 계획 → 학습 경험 순서를 강제하고, 지식·이해 / 과정·기능 / 가치·태도를 통합해 평가하게 합니다.</p>
-      </div>
-    </div>
-    <div class="note note-warn mt16">
-      <div class="note-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>사용 전 반드시 확인</div>
-      ① 반영 비율·고사 횟수·성적 산출 방식은 <b>학교 학업성적관리규정과 교과협의회 결정</b>이 우선입니다. 여기서 만든 계획서는 협의 자료용 초안입니다. ② 학생 개인정보를 입력하지 마십시오. ③ AI가 제시한 성취기준 코드와 원문은 <b>반드시 교육과정 원문과 대조</b>하십시오. ④ 소속 교육청의 생성형 AI 활용 지침을 따르십시오.
-    </div>
+    <p>앞 메뉴가 <b>문항 하나</b>를 만드는 조수였다면, 이 에이전트는 <b>한 학기 계획서 전체</b>를 만듭니다. 먼저 <b>1학기 또는 2학기를 선택하고, 해당 학기에 가르칠 단원명</b>을 입력하면 수업 범위에 맞는 더 정확한 프롬프트가 만들어집니다. 수행평가는 <b>영역 + 세부 주제 한 줄</b>로 활동과 루브릭까지 구체화할 수 있습니다.</p>
   </div>
 
   <!-- 7-2 조건 입력 -->
-  <div class="section-title">02. 계획 조건 입력</div>
+  <div class="section-title">01. 학기와 수업 범위 정하기</div>
   <div class="card">
     <div class="card-head">
       <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg></div>
-      <div><h2>여기서 정한 값이 그대로 지시문에 들어갑니다</h2><p class="desc">비율을 바꾸면 아래 미리보기와 지시문이 즉시 다시 만들어집니다.</p></div>
+      <div><h2>학기 선택 → 단원 입력 → 수행평가 주제</h2><p class="desc">수업 범위와 주제를 구체적으로 알려 줄수록 활동·평가 요소·루브릭이 우리 수업에 맞춰집니다. 입력 즉시 지시문에 반영됩니다.</p></div>
     </div>
 
-    <div class="grid g4">
+    <div class="grid g3">
       <div class="field"><label>학년</label>
         <select data-k="g_grade" data-agent2="1">
           <option value="1">중학교 1학년</option>
@@ -2759,14 +2754,16 @@ html[data-theme="dark"] .prompt-out { background: #0e1424; }
         <input type="text" data-k="g_course" data-agent2="1" value="과학" placeholder="예) 과학 / 통합과학 / 물리학">
         <p class="hint">지시문의 이름과 역할 문장에 그대로 들어갑니다.</p>
       </div>
-      <div class="field"><label>단원명</label>
-        <input type="text" data-k="g_unit" data-agent2="1" placeholder="예) 물질의 상태 변화">
-        <p class="hint">비워 두면 과목명만으로 계획서를 만듭니다.</p>
-      </div>
     </div>
+    <div class="field"><label for="g_unit" id="gUnitLabel">1학기 수업 단원명 <span class="tag b">입력 추천</span></label>
+      <textarea id="g_unit" data-k="g_unit" data-agent2="1" rows="2" placeholder="교과서 목차의 단원명을 쉼표 또는 줄바꿈으로 입력하세요.&#10;예) 물질의 특성, 혼합물의 분리, 열과 우리 생활" aria-describedby="gUnitHint"></textarea>
+      <p class="hint" id="gUnitHint">1학기·2학기를 고른 뒤 해당 학기의 단원명을 입력하면 더 정확한 프롬프트가 만들어집니다. 단원 배치는 학교·교과서에 따라 다르므로 실제 수업 범위를 적어 주세요.</p>
+    </div>
+    <div class="agent-status" id="g_scopeStatus" role="status" aria-live="polite"></div>
 
     <div class="divider"></div>
 
+    <h3 class="agent-subtitle">02. 평가 비율과 수행평가 주제 정하기</h3>
     <div class="field"><label>정기고사 구성 <span class="tag b">선택형 + 서·논술형</span></label>
       <div class="chips" data-chipset="g_exams" data-k="g_exams" data-agent2="1">
         <button class="chip on" type="button" data-v="mid">중간고사 실시</button>
@@ -2801,8 +2798,10 @@ html[data-theme="dark"] .prompt-out { background: #0e1424; }
         <label class="lbl">수행평가 과제 구성 <span class="tag g" id="g_perfTag">수행 0%</span></label>
         <button type="button" class="btn btn-sm btn-soft no-print" data-add="planTask">+ 수행평가 추가</button>
       </div>
+      <p class="hint">영역은 평가 방식, 세부 주제는 학생이 실제로 할 활동입니다. <b>예: 실험·실습 → 밀도 차를 이용한 혼합물 분리</b></p>
+      <datalist id="planTaskAreas"><option value="실험·실습"><option value="서·논술형"><option value="탐구 보고서"><option value="프로젝트"><option value="토의·토론"><option value="포트폴리오"></datalist>
       <div data-rep="planTask"></div>
-      <p class="hint">과제별 비율의 합이 수행평가 전체 비율이 됩니다. 실험·실습 과제를 반드시 하나 이상 넣으십시오.</p>
+      <p class="hint">세부 주제를 한 줄만 적으면 활동 절차·산출물·평가 요소·루브릭을 함께 설계합니다. 비워 두면 입력한 단원과 영역에 맞는 주제를 AI가 추천합니다. 과제별 비율의 합이 수행평가 비율이며, 실험·실습 과제를 하나 이상 포함하십시오.</p>
     </div>
 
     <div class="divider"></div>
@@ -2834,12 +2833,45 @@ html[data-theme="dark"] .prompt-out { background: #0e1424; }
         <button class="btn btn-sm" data-word="planPromptOut" data-name="교수학습_평가계획_에이전트_지시문" data-title="교수학습·평가 계획 에이전트 지시문">Word</button>
       </div>
     </div>
-    <div class="prompt-out" id="planPromptOut"></div>
+    <div class="agent-status" id="g_promptStatus" role="status" aria-live="polite"></div>
+    <div class="prompt-out" id="planPromptOut" tabindex="0" aria-label="평가계획 에이전트 지시문"></div>
     <div class="note note-info mt12">
       <div class="note-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>지식 파일로 함께 올리면 좋은 자료</div>
       ① 해당 학년 <b>교육과정 성취기준·성취수준 해설서</b> ② 우리 학교 학업성적관리시행지침 ③ 지난 학기 교수학습·평가 계획서 ④ 교과서 목차와 차시 배분표. 이 자료가 있으면 에이전트가 성취기준 코드를 지어내지 않고 <b>원문에서 찾아 씁니다.</b>
     </div>
   </div>
+
+  <!-- 7-1 기준 -->
+  <details class="agent-details card"><summary>설계 기준과 사용 전 확인 <span>평가 비율·수업 중 평가·교육과정</span></summary><div class="details-body">
+  <div class="card">
+    <div class="card-head">
+      <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></div>
+      <div><h2>학생평가 내실화 방향을 지시문에 못 박습니다</h2><p class="desc">AI가 임의로 비율을 정하지 못하도록, 교사가 정한 수치를 지시문 안에 고정값으로 넣습니다.</p></div>
+    </div>
+    <div class="grid g2">
+      <div class="dok l3">
+        <div class="dok-lv">Rule 01</div><h5>수행평가 비중 확보</h5>
+        <p>학기 성적에서 수행평가가 차지하는 비율을 <b>먼저</b> 정하고, 정기고사는 그 나머지로 맞춥니다. 과제 구성은 교사가 직접 적습니다.</p>
+      </div>
+      <div class="dok l2">
+        <div class="dok-lv">Rule 02</div><h5>서·논술형 30% 이상</h5>
+        <p>정기고사 안의 서·논술형과 수행평가를 <b>합산</b>해 계산합니다. 아래 게이지가 실시간으로 충족 여부를 보여 줍니다.</p>
+      </div>
+      <div class="dok l4">
+        <div class="dok-lv">Rule 03</div><h5>수업 중 과정 평가</h5>
+        <p>가정에서 해 오는 과제형 수행평가와 단편적 지식 암기를 <b>금지 사항</b>으로 명시합니다. 실험·실습을 반드시 포함시킵니다.</p>
+      </div>
+      <div class="dok l1">
+        <div class="dok-lv">Rule 04</div><h5>백워드 설계</h5>
+        <p>목표(바라는 결과) → 평가 계획 → 학습 경험 순서를 강제하고, 지식·이해 / 과정·기능 / 가치·태도를 통합해 평가하게 합니다.</p>
+      </div>
+    </div>
+    <div class="note note-warn mt16">
+      <div class="note-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>사용 전 반드시 확인</div>
+      ① 반영 비율·고사 횟수·성적 산출 방식은 <b>학교 학업성적관리규정과 교과협의회 결정</b>이 우선입니다. 여기서 만든 계획서는 협의 자료용 초안입니다. ② 학생 개인정보를 입력하지 마십시오. ③ AI가 제시한 성취기준 코드와 원문은 <b>반드시 교육과정 원문과 대조</b>하십시오. ④ 소속 교육청의 생성형 AI 활용 지침을 따르십시오.
+    </div>
+  </div>
+  </div></details>
 
   <!-- 7-4 붙여넣을 곳 -->
   <div class="section-title">04. 어디에 붙여 넣는가</div>
@@ -2919,6 +2951,7 @@ html[data-theme="dark"] .prompt-out { background: #0e1424; }
 
 </section>
 
+</main>
 
 <footer class="wrap no-print" style="padding-top:0;padding-bottom:40px">
   <div class="card flat" style="text-align:center;background:transparent;border-style:dashed">
@@ -2967,6 +3000,6 @@ html[data-theme="dark"] .prompt-out { background: #0e1424; }
 <div id="toast" role="status" aria-live="polite"></div>
 
 <script src="assets/standards.js?v=20260905c"></script>
-<script src="assets/app.js?v=20260905c"></script>
+<script src="assets/app.js?v=20260916a"></script>
 </body>
 </html>
