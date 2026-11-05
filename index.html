@@ -1074,9 +1074,12 @@ html[data-theme="dark"] .prompt-out { background: #0e1424; }
 #p5 .field-head, #p7 .field-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
 .agent-details summary:focus-visible { outline: 3px solid var(--brand); outline-offset: 3px; }
 @media (max-width: 720px) {
-  #p5 .card-head, #p7 .card-head { flex-wrap: wrap; }
-  #p5 .card-head > div:nth-child(2), #p7 .card-head > div:nth-child(2) { flex: 1; min-width: 0; }
-  #p5 .card-head-tools, #p7 .card-head-tools { flex-basis: 100%; margin-left: 0; flex-wrap: wrap; }
+  #p5 .card-head, #p7 .card-head,
+  #p2 .card-head, #p3 .card-head, #p4 .card-head, #p6 .card-head { flex-wrap: wrap; }
+  #p5 .card-head > div:nth-child(2), #p7 .card-head > div:nth-child(2),
+  #p2 .card-head > div:nth-child(2), #p3 .card-head > div:nth-child(2), #p4 .card-head > div:nth-child(2), #p6 .card-head > div:nth-child(2) { flex: 1; min-width: 0; }
+  #p5 .card-head-tools, #p7 .card-head-tools,
+  #p2 .card-head-tools, #p3 .card-head-tools, #p4 .card-head-tools, #p6 .card-head-tools { flex-basis: 100%; margin-left: 0; flex-wrap: wrap; }
   .rep-body.task { grid-template-columns: minmax(0,1fr) 90px; }
   .task-field-topic { grid-column: 1 / -1; grid-row: 2; }
   .agent-details > summary span { display: block; margin: 5px 0 0; }
@@ -3208,7 +3211,7 @@ html[data-theme="dark"] .prompt-out { background: #0e1424; }
 
 <div id="toast" role="status" aria-live="polite"></div>
 
-<script src="assets/standards.js?v=20260905c"></script>
-<script src="assets/app.js?v=20260917a"></script>
+<script src="assets/standards.js?v=20261105a"></script>
+<script src="assets/app.js?v=20261105a"></script>
 </body>
 </html>

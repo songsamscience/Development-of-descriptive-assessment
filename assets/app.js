@@ -1955,7 +1955,7 @@ function renderItemDoc() {
 function renderRubricDoc() {
   var box = $('#rubricDoc'); if (!box) return;
   var holistic = state.f.r_kind === 'holistic';
-  var h = '';
+  var h = '', secN = 1;
   h += '<div class="doc-title">서·논술형 평가 채점기준표<small>' +
     esc(holistic ? '총체적 채점' : '분석적 채점') + ' · ' + esc(F('r_scope') || '적용 범위 미선택') +
     ' · ' + levelCount() + '단계' + (isBlank(F('r_total')) ? '' : ' · 총 ' + esc(F('r_total'))) + '</small></div>';
@@ -1966,7 +1966,7 @@ function renderRubricDoc() {
   ]);
 
   if (!holistic) {
-    h += '<div class="doc-sec"><h3>1. 분석적 채점기준</h3>';
+    h += '<div class="doc-sec"><h3>' + (secN++) + '. 분석적 채점기준</h3>';
     if (!state.rubric.length) h += '<p class="muted">채점 요소가 없습니다.</p>';
     else {
       var SLd = showLabelCol();
@@ -1990,7 +1990,7 @@ function renderRubricDoc() {
 
   var hl = (state.holistic.levels || []).filter(function (l) { return !isBlank(l.desc); });
   if (holistic || hl.length) {
-    h += '<div class="doc-sec"><h3>' + (holistic ? '1' : '2') + '. 총체적 채점기준</h3>';
+    h += '<div class="doc-sec"><h3>' + (secN++) + '. 총체적 채점기준</h3>';
     if (!hl.length) h += '<p class="muted">총체적 채점기준 진술이 없습니다.</p>';
     else {
       var SLh = showLabelCol();
@@ -2006,7 +2006,7 @@ function renderRubricDoc() {
 
   var fb = FB_LEVELS.filter(function (L) { var v = state.levelFb[L] || {}; return !isBlank(v.range) || !isBlank(v.text); });
   if (fb.length) {
-    h += '<div class="doc-sec"><h3>3. 성취수준별 예상 수행 특성과 피드백</h3><table><thead><tr><th style="width:60px">수준</th><th style="width:100px">점수 구간</th><th>수행 특성 · 피드백</th></tr></thead><tbody>' +
+    h += '<div class="doc-sec"><h3>' + (secN++) + '. 성취수준별 예상 수행 특성과 피드백</h3><table><thead><tr><th style="width:60px">수준</th><th style="width:100px">점수 구간</th><th>수행 특성 · 피드백</th></tr></thead><tbody>' +
       fb.map(function (L) {
         var v = state.levelFb[L] || {};
         return '<tr><td style="text-align:center"><b>' + L + '</b></td><td style="text-align:center">' + orDash(v.range, '–') + '</td><td>' + nl2br(v.text) + '</td></tr>';
@@ -2014,7 +2014,7 @@ function renderRubricDoc() {
   }
 
   if (!isBlank(F('r_inter')) || !isBlank(F('r_intra')) || !isBlank(F('r_notice'))) {
-    h += '<div class="doc-sec"><h3>4. 채점 운영 계획</h3><table><tbody>' +
+    h += '<div class="doc-sec"><h3>' + (secN++) + '. 채점 운영 계획</h3><table><tbody>' +
       '<tr><th style="width:160px">채점자 간 신뢰도</th><td>' + (isBlank(F('r_inter')) ? '<span class="muted">미입력</span>' : nl2br(F('r_inter'))) + '</td></tr>' +
       '<tr><th>채점자 내 신뢰도</th><td>' + (isBlank(F('r_intra')) ? '<span class="muted">미입력</span>' : nl2br(F('r_intra'))) + '</td></tr>' +
       '<tr><th>공지 계획</th><td>' + (isBlank(F('r_notice')) ? '<span class="muted">미입력</span>' : nl2br(F('r_notice'))) + '</td></tr>' +
@@ -2893,12 +2893,14 @@ function varStyle() {
 function bakeClone(src) {
   var clone = src.cloneNode(true);
   $$('details', clone).forEach(function (el) { el.open = true; });
-  $$('.no-print', clone).forEach(function (n) { n.parentNode && n.parentNode.removeChild(n); });
 
+  /* 원본·복제본 입력칸은 .no-print 를 지우기 전에 짝지어 둔다.
+     (지운 뒤에 짝지으면 그 뒤 입력칸의 값·체크 상태가 한 칸씩 밀린다) */
   var srcInputs = $$('input,textarea,select', src);
   var cloneInputs = $$('input,textarea,select', clone);
+  $$('.no-print', clone).forEach(function (n) { n.parentNode && n.parentNode.removeChild(n); });
   cloneInputs.forEach(function (c, i) {
-    var o = srcInputs[i]; if (!o) return;
+    var o = srcInputs[i]; if (!o || !clone.contains(c)) return;
     var tag = c.tagName.toLowerCase();
     if (tag === 'input' && (c.type === 'checkbox' || c.type === 'radio')) {
       if (o.checked) c.setAttribute('checked', 'checked'); else c.removeAttribute('checked');
