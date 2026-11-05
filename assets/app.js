@@ -810,6 +810,7 @@ function renderRep(name) {
     el.addEventListener('input', function () {
       arr[+el.dataset.i][el.dataset.f] = el.value; autosave(); liveDoc(el);
       if (name === 'planTask') buildPlanPrompt();
+      scheduleStatus();
     });
   });
   $$('[data-del]', box).forEach(function (b) {
@@ -1183,6 +1184,7 @@ function itemDiagnose() {
     (e.levels || []).forEach(function (lv) { var v = parseFloat(lv.score); if (!isNaN(v) && v > m) m = v; });
     sum += m;
   });
+  sum = Math.round(sum * 100) / 100;   /* 1.2 + 2.4 = 3.5999… 같은 소수 오차 표시 방지 */
   if (pt !== null && sum > 0 && Math.abs(pt - sum) > 0.01) {
     add('bad', '배점이 맞지 않습니다 — 문항 ' + pt + '점 · 채점기준 합계 ' + sum + '점', '문항의 배점과 채점 요소별 최고점의 합이 다릅니다. 둘 중 하나를 고치십시오.', '[data-k="i_point"]');
   } else if (pt !== null && sum > 0) {
@@ -1248,6 +1250,7 @@ function rubricDiagnose() {
       (e.levels || []).forEach(function (lv) { var v = parseFloat(lv.score); if (!isNaN(v) && v > m) m = v; });
       sum += m;
     });
+    sum = Math.round(sum * 100) / 100;   /* 소수 오차 표시 방지 */
     var total = numOf(F('r_total')) !== null ? numOf(F('r_total')) : numOf(F('i_point'));
     if (total !== null && Math.abs(total - sum) > 0.01) add('bad', '배점 합계가 총 배점과 다릅니다 — 합계 ' + sum + '점 · 총 배점 ' + total + '점', '요소별 최고점의 합이 총 배점과 같아야 합니다.', '[data-k="r_total"]');
     else if (total !== null) add('ok', '배점 합계 ' + sum + '점 = 총 배점', '', '');
@@ -1566,7 +1569,7 @@ function renderVerbs() {
         var ta = $('[data-k="i_qDirect"]');
         var cur = ta.value.replace(/\s*$/, '');
         ta.value = cur ? (cur + ' ' + b.dataset.verb + '.') : ('… ' + b.dataset.verb + '.');
-        state.f.i_qDirect = ta.value; autosave(); renderItemDoc();
+        state.f.i_qDirect = ta.value; autosave(); renderItemDoc(); scheduleStatus();
         ta.focus();
         toast('‘' + b.dataset.verb + '’를 발문에 넣었습니다', 'ok');
       });
@@ -1654,7 +1657,7 @@ function normalizeLevels(el) {
 }
 function addRubricElem(name) {
   state.rubric.push(normalizeLevels({ name: name || '', levels: [] }));
-  renderRubric(); autosave();
+  renderRubric(); autosave(); scheduleStatus();
 }
 function renderRubric() {
   var box = $('[data-rep="rubricElem"]'); if (!box) return;
@@ -1703,7 +1706,7 @@ function renderRubric() {
   });
   $$('[data-delidx]', box).forEach(function (b) {
     b.addEventListener('click', function () {
-      state.rubric.splice(+b.dataset.delidx, 1); renderRubric(); autosave();
+      state.rubric.splice(+b.dataset.delidx, 1); renderRubric(); autosave(); scheduleStatus();
     });
   });
   updateRubricSum(); renderHolistic(); renderLevelFeedback(); renderRubricDoc();
@@ -1790,7 +1793,7 @@ function pullElems() {
     if (state.rubric.some(function (e) { return e.name === nm; })) return;
     state.rubric.push(normalizeLevels({ name: nm, levels: [] })); got++;
   });
-  renderRubric(); autosave();
+  renderRubric(); autosave(); scheduleStatus();
   toast(got ? got + '개 항목을 채점 요소로 가져왔습니다' : '가져올 새 항목이 없습니다', got ? 'ok' : 'warn');
 }
 
@@ -2511,6 +2514,7 @@ function initAgentMode() {
    PART 11-b. 교수학습·평가 계획 에이전트
    ====================================================================== */
 function planInt(k, d) {
+  if (state.f[k] === '') return 0;   /* 칸을 비우면 화면과 같게 0으로 계산 */
   var v = parseInt(state.f[k], 10);
   return isNaN(v) ? d : Math.max(0, Math.min(100, v));
 }
@@ -2776,7 +2780,7 @@ function buildPlanPrompt() {
   var list = d.tasks.length ? d.tasks : [{ name: '(영역 추천)', topic: '', pct: '' }];
   list.forEach(function (x, i) {
     t.push('');
-    t.push('**[과제 ' + (i + 1) + ' · ' + (x.name || '과제') + (x.pct ? ' / ' + parseInt(x.pct, 10) + '%' : '') + ']**');
+    t.push('**[과제 ' + (i + 1) + ' · ' + (x.name || '과제') + (x.pct ? ' / ' + (parseInt(x.pct, 10) || 0) + '%' : '') + ']**');
     t.push('');
     t.push('- **평가 영역** ' + (x.name || '(주제에 맞게 추천)'));
     t.push('- **세부 수행평가 주제** ' + (isBlank(x.topic) ? '(입력 단원과 영역에 맞는 주제 1개를 추천하여 작성)' : x.topic.trim()));
@@ -2873,6 +2877,8 @@ var BAKE_CSS = [
   '.plat-panel{display:block !important}',
   '#bgcanvas,#bgfx{display:none}'
 ].join('');
+/* 등장 애니메이션(opacity 0에서 시작)이 0프레임에 찍혀 메뉴 이미지가 빈 화면이 되지 않게 (이미지 안에서만 적용) */
+var BAKE_SNAP_CSS = '*,*::before,*::after{animation:none !important}';
 
 function cssText() {
   var s = document.getElementById('appcss');
@@ -2904,6 +2910,8 @@ function bakeClone(src) {
     var tag = c.tagName.toLowerCase();
     if (tag === 'input' && (c.type === 'checkbox' || c.type === 'radio')) {
       if (o.checked) c.setAttribute('checked', 'checked'); else c.removeAttribute('checked');
+      /* 복제본을 문서에 잠깐 붙일 때(PNG) 원본과 같은 라디오 묶음이 되어 화면의 선택이 풀리지 않게 */
+      if (c.type === 'radio') c.removeAttribute('name');
       return;
     }
     var val = '';
@@ -2930,8 +2938,12 @@ function exportPng(elId, filename) {
   var stage = document.createElement('div');
   stage.setAttribute('style', 'position:fixed;left:-99999px;top:0;width:' + W + 'px;z-index:-1');
   var wrap = document.createElement('div');
-  wrap.setAttribute('style', varStyle() + ';width:' + W + 'px;padding:24px;box-sizing:border-box;background:var(--bg);font-family:var(--font);color:var(--text)');
+  wrap.setAttribute('style', varStyle() + ';width:' + W + 'px;padding:24px;box-sizing:border-box;background:var(--bg);font-family:var(--font);color:var(--text);font-size:15px;line-height:1.65');
   wrap.appendChild(bakeClone(src));
+  /* 이미지와 같은 조건(목록 펼침·입력칸 상자)으로 높이를 재야 아래쪽이 잘리지 않는다 */
+  var bakeStyle = document.createElement('style');
+  bakeStyle.textContent = BAKE_CSS;
+  stage.appendChild(bakeStyle);
   stage.appendChild(wrap);
   document.body.appendChild(stage);
 
@@ -2942,11 +2954,11 @@ function exportPng(elId, filename) {
   var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '">' +
     '<foreignObject x="0" y="0" width="' + W + '" height="' + H + '">' +
     '<div xmlns="http://www.w3.org/1999/xhtml">' +
-    '<style type="text/css"><![CDATA[' + cssText() + BAKE_CSS + ']]></style>' +
+    '<style type="text/css"><![CDATA[' + cssText() + BAKE_CSS + BAKE_SNAP_CSS + ']]></style>' +
     inner + '</div></foreignObject></svg>';
 
   var img = new Image();
-  var scale = 2;
+  var scale = Math.min(2, 32000 / H);   /* 캔버스 최대 크기(한 변 약 32,767px)를 넘지 않게 */
   img.onload = function () {
     var cv = document.createElement('canvas');
     cv.width = W * scale; cv.height = H * scale;
@@ -3237,7 +3249,7 @@ function syncBasic() {
     var e4 = $('[data-k="i_scene"]');
     if (e4) { e4.value = F('mScene'); state.f.i_scene = e4.value; }
   }
-  autosave(); renderItemDoc(); renderRubricDoc();
+  autosave(); renderItemDoc(); renderRubricDoc(); scheduleStatus();
   toast('기본 정보를 불러왔습니다', 'ok');
 }
 /* 입력칸 하나에 값을 넣고 화면도 함께 맞춘다 */
@@ -3323,7 +3335,7 @@ function autoAnalyze() {
   });
   if (isBlank(F('anKnow'))) { state.f.anKnow = know.join('\n'); $('[data-k="anKnow"]').value = state.f.anKnow; }
   if (isBlank(F('anSkill')) && skill.length) { state.f.anSkill = uniq(skill).join('\n'); $('[data-k="anSkill"]').value = state.f.anSkill; }
-  autosave(); renderPlanDoc();
+  autosave(); renderPlanDoc(); scheduleStatus();
   toast('성취기준 문장을 불러왔습니다. 학생이 할 일로 다듬어 주십시오.', 'ok');
 }
 function resetAll() {
